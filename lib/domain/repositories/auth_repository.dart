@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:movie_app/ui/core/error/failures';
 import '../entities/user.dart';
-import 'package:movie_app/lib/ui/core/error/failures';
 
 abstract class AuthRepository {
   Future<Either<Failure, User>> login({
