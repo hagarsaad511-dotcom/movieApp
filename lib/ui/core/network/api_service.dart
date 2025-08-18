@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:movie_app/data/models/auth_models.dart';
-import 'package:movie_app/data/models/movie_models.dart';
+
 
 part 'api_service.g.dart';
 
@@ -22,32 +22,4 @@ abstract class ApiService {
   @PUT('/auth/profile')
   Future<UserModel> updateProfile(@Body() UpdateProfileRequest request);
 
-  // Movies endpoints
-  @GET('/v2/list_movies.json')
-  Future<MoviesResponse> getMovies({
-    @Query('page') int? page,
-    @Query('limit') int? limit,
-    @Query('query_term') String? searchTerm,
-    @Query('genre') String? genre,
-  });
-
-  @GET('/v2/movie_details.json')
-  Future<MovieDetailsResponse> getMovieDetails({
-    @Query('movie_id') required int movieId,
-  });
-
-  @GET('/v2/movie_suggestions.json')
-  Future<MoviesResponse> getMovieSuggestions({
-    @Query('movie_id') required int movieId,
-  });
-
-  // Favorites
-  @GET('/favorites')
-  Future<List<MovieModel>> getFavorites();
-
-  @POST('/favorites')
-  Future<void> addToFavorites(@Body() Map<String, dynamic> movieData);
-
-  @DELETE('/favorites/{movieId}')
-  Future<void> removeFromFavorites(@Path('movieId') int movieId);
 }
