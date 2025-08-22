@@ -3,32 +3,37 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:movie_app/ui/core/di/injection_container.dart';
+import 'package:movie_app/presentation/screens/login_screen.dart';
+import '../../ui/core/di/injection_container.dart';
+
 import '../../ui/core/themes/app_colors.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/loading_button.dart';
 
-final getIt = GetIt.instance;
-
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -38,6 +43,18 @@ class _LoginScreenState extends State<LoginScreen> {
       create: (context) => getIt<AuthCubit>(),
       child: Scaffold(
         backgroundColor: AppColors.primaryBlack,
+        appBar: AppBar(
+          backgroundColor: AppColors.primaryBlack,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppColors.white,
+              size: 24.sp,
+            ),
+          ),
+        ),
         body: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthAuthenticated) {
@@ -59,45 +76,41 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 60.h),
-                    // Logo and title
-                    Center(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 80.w,
-                            height: 80.h,
-                            decoration: const BoxDecoration(
-                              color: AppColors.yellow,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.movie,
-                              size: 40.sp,
-                              color: AppColors.primaryBlack,
-                            ),
-                          ),
-                          SizedBox(height: 24.h),
-                          Text(
-                            'Welcome Back!',
-                            style: TextStyle(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.white,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            'Sign in to continue watching',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              color: AppColors.lightGrey,
-                            ),
-                          ),
-                        ],
+                    // Title
+                    Text(
+                      'Create Account',
+                      style: TextStyle(
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Sign up to start watching movies',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: AppColors.lightGrey,
                       ),
                     ),
                     SizedBox(height: 48.h),
+                    // Name field
+                    CustomTextField(
+                      controller: _nameController,
+                      hintText: 'Full Name',
+                      prefixIcon: Icon(
+                        Icons.person_outlined,
+                        color: AppColors.lightGrey,
+                        size: 20.sp,
+                      ),
+                      validator: (value) {
+                        if (value?.isEmpty ?? true) {
+                          return 'Please enter your name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20.h),
                     // Email field
                     CustomTextField(
                       controller: _emailController,
@@ -117,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           return 'Please enter a valid email';
                         }
                         return null;
-                      },
+                        },
                     ),
                     SizedBox(height: 20.h),
                     // Password field
@@ -131,9 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         size: 20.sp,
                       ),
                       suffixIcon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
                         color: AppColors.lightGrey,
                         size: 20.sp,
                       ),
@@ -152,33 +163,51 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16.h),
-                    // Forgot password
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => context.push('/forgot-password'),
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.yellow,
-                          ),
-                        ),
+                    SizedBox(height: 20.h),
+                    // Confirm password field
+                    CustomTextField(
+                      controller: _confirmPasswordController,
+                      hintText: 'Confirm Password',
+                      obscureText: _obscureConfirmPassword,
+                      prefixIcon: Icon(
+                        Icons.lock_outlined,
+                        color: AppColors.lightGrey,
+                        size: 20.sp,
                       ),
+                      suffixIcon: Icon(
+                        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                        color: AppColors.lightGrey,
+                        size: 20.sp,
+                      ),
+                      onSuffixIconTap: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                      validator: (value) {
+                        if (value?.isEmpty ?? true) {
+                          return 'Please confirm your password';
+                        }
+                        if (value != _passwordController.text) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      },
                     ),
                     SizedBox(height: 32.h),
-                    // Login button
+                    // Register button
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return LoadingButton(
-                          text: 'Sign In',
+                          text: 'Create Account',
                           isLoading: state is AuthLoading,
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
-                              context.read<AuthCubit>().login(
+                              context.read<AuthCubit>().register(
+                                name: _nameController.text.trim(),
                                 email: _emailController.text.trim(),
                                 password: _passwordController.text,
+                                passwordConfirmation: _confirmPasswordController.text,
                               );
                             }
                           },
@@ -186,21 +215,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const Spacer(),
-                    // Sign up link
+                    // Sign in link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Don\'t have an account? ',
+                          'Already have an account? ',
                           style: TextStyle(
                             fontSize: 14.sp,
                             color: AppColors.lightGrey,
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => context.push('/register'),
+                          onTap: () => context.pop(),
                           child: Text(
-                            'Sign Up',
+                            'Sign In',
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: AppColors.yellow,
