@@ -1,4 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -10,8 +12,9 @@ import '../models/auth_models.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final LocalDataSource localDataSource;
-
-  AuthRepositoryImpl(this.remoteDataSource, this.localDataSource);
+  final SharedPreferences sharedPreferences;
+  final InternetConnectionChecker connectionChecker;
+  AuthRepositoryImpl(this.remoteDataSource, this.localDataSource,{required this.sharedPreferences, required this.connectionChecker,});
 
   @override
   Future<Either<Failure, User>> login({

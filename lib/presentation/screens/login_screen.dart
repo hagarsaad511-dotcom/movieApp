@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import'package:movie_app/presentation/screens/register_screen.dart';
 import 'package:movie_app/ui/core/di/injection_container.dart';
 import '../../ui/core/themes/app_colors.dart';
 import '../cubits/auth/auth_cubit.dart';
