@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
-class LanguageProvider extends ChangeNotifier {
-  Locale _locale = const Locale('en');
+class LanguageProvider with ChangeNotifier {
+  String _currentLangCode = "en";
 
-  Locale get locale => _locale;
-  String get currentLangCode => _locale.languageCode;
+  String get currentLangCode => _currentLangCode;
 
-  void setLocale(Locale locale) {
-    if (!['en', 'ar'].contains(locale.languageCode)) return;
-    _locale = locale;
+  void toggleLang() {
+    _currentLangCode = _currentLangCode == "en" ? "ar" : "en";
     notifyListeners();
   }
 
-  void toggleLang() {
-    setLocale(_locale.languageCode == 'en' ? const Locale('ar') : const Locale('en'));
+  void setLang(String code) {
+    _currentLangCode = code;
+    notifyListeners();
   }
-
   TextDirection get direction =>
-      _locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr;
+      _currentLangCode == "ar" ? TextDirection.rtl : TextDirection.ltr;
+
 }

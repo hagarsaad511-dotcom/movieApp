@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/home', builder: (_, __) => const Placeholder()),
         GoRoute(path: '/forgot-password', builder: (_, __) => const Placeholder()),
-        GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+       //oRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
       ],
     );
 
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
               primaryColor: AppColors.yellow,
               fontFamily: 'Roboto',
             ),
-            locale: langProvider.locale,
+            locale: Locale(langProvider.currentLangCode),
             supportedLocales: AppLocalizations.supportedLocales,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
 
