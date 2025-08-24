@@ -1,0 +1,17 @@
+{
+  "@@locale": "ar",
+  "loginTitle": "مرحباً بعودتك!",
+  "loginSubtitle": "سجّل الدخول لمتابعة المشاهدة",
+  "emailHint": "البريد الإلكتروني",
+  "passwordHint": "كلمة المرور",
+  "forgotPassword": "هل نسيت كلمة المرور؟",
+  "loginButton": "تسجيل الدخول",
+  "googleLogin": "سجّل دخولك باستخدام جوجل",
+  "noAccount": "ليس لديك حساب؟",
+  "signUp": "إنشاء حساب",
+  "language": "اللغة",
+  "enterEmailError": "الرجاء إدخال البريد الإلكتروني",
+  "invalidEmailError": "الرجاء إدخال بريد إلكتروني صالح",
+  "enterPasswordError": "الرجاء إدخال كلمة المرور",
+  "passwordLengthError": "يجب أن تتكوّن كلمة المرور من 6 أحرف على الأقل"
+}

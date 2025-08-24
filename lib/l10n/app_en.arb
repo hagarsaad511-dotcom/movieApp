@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "loginTitle": "Welcome Back!",
+  "loginSubtitle": "Sign in to continue watching",
+  "emailHint": "Email",
+  "passwordHint": "Password",
+  "forgotPassword": "Forgot Password?",
+  "loginButton": "Log In",
+  "googleLogin": "Sign in with Google",
+  "noAccount": "Don’t have an account?",
+  "signUp": "Sign Up",
+  "language": "Language",
+  "enterEmailError": "Please enter your email",
+  "invalidEmailError": "Please enter a valid email",
+  "enterPasswordError": "Please enter your password",
+  "passwordLengthError": "Password must be at least 6 characters"
+}

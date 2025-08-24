@@ -3,13 +3,17 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import'package:movie_app/presentation/screens/register_screen.dart';
-import 'package:movie_app/ui/core/di/injection_container.dart';
-import '../../ui/core/themes/app_colors.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:movie_app/ui/core/themes/app_colors.dart';
+
+import '/../l10n/gen/app_localizations.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/loading_button.dart';
+import 'language_provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -35,8 +39,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context)!;
+    final langProvider = context.watch<LanguageProvider>();
+
     return BlocProvider(
-      create: (context) => getIt<AuthCubit>(),
+      create: (_) => getIt<AuthCubit>(),
       child: Scaffold(
         backgroundColor: AppColors.primaryBlack,
         body: BlocListener<AuthCubit, AuthState>(
@@ -61,7 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 60.h),
-                    // Logo and title
                     Center(
                       child: Column(
                         children: [
@@ -80,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 24.h),
                           Text(
-                            'Welcome Back!',
+                            lang.loginTitle,
                             style: TextStyle(
                               fontSize: 28.sp,
                               fontWeight: FontWeight.bold,
@@ -89,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 8.h),
                           Text(
-                            'Sign in to continue watching',
+                            lang.loginSubtitle,
                             style: TextStyle(
                               fontSize: 16.sp,
                               color: AppColors.lightGrey,
@@ -99,10 +105,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 48.h),
-                    // Email field
                     CustomTextField(
                       controller: _emailController,
-                      hintText: 'Email',
+                      hintText: lang.emailHint,
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: Icon(
                         Icons.email_outlined,
@@ -110,21 +115,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         size: 20.sp,
                       ),
                       validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        if (value?.isEmpty ?? true) return lang.enterEmailError;
+                        if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
                             .hasMatch(value!)) {
-                          return 'Please enter a valid email';
+                          return lang.invalidEmailError;
                         }
                         return null;
                       },
                     ),
                     SizedBox(height: 20.h),
-                    // Password field
                     CustomTextField(
                       controller: _passwordController,
-                      hintText: 'Password',
+                      hintText: lang.passwordHint,
                       obscureText: _obscurePassword,
                       prefixIcon: Icon(
                         Icons.lock_outlined,
@@ -132,48 +134,35 @@ class _LoginScreenState extends State<LoginScreen> {
                         size: 20.sp,
                       ),
                       suffixIcon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
                         color: AppColors.lightGrey,
                         size: 20.sp,
                       ),
-                      onSuffixIconTap: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                      onSuffixIconTap: () => setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      }),
                       validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please enter your password';
-                        }
-                        if (value!.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
+                        if (value?.isEmpty ?? true) return lang.enterPasswordError;
+                        if (value!.length < 6) return lang.passwordLengthError;
                         return null;
                       },
                     ),
                     SizedBox(height: 16.h),
-                    // Forgot password
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () => context.push('/forgot-password'),
                         child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.yellow,
-                          ),
+                          lang.forgotPassword,
+                          style: TextStyle(fontSize: 14.sp, color: AppColors.yellow),
                         ),
                       ),
                     ),
                     SizedBox(height: 32.h),
-                    // Login button
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return LoadingButton(
-                          text: 'Sign In',
+                          text: lang.loginButton,
                           isLoading: state is AuthLoading,
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
@@ -187,21 +176,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const Spacer(),
-                    // Sign up link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Don\'t have an account? ',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.lightGrey,
-                          ),
+                          '${lang.noAccount} ',
+                          style: TextStyle(fontSize: 14.sp, color: AppColors.lightGrey),
                         ),
                         GestureDetector(
                           onTap: () => context.push('/register'),
                           child: Text(
-                            'Sign Up',
+                            lang.signUp,
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: AppColors.yellow,
@@ -210,6 +195,33 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
+                    ),
+                    SizedBox(height: 24.h),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => langProvider.toggleLang(),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                          decoration: BoxDecoration(
+                            color: AppColors.yellow.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.language, color: AppColors.yellow),
+                              SizedBox(width: 8.w),
+                              Text(
+                                langProvider.currentLangCode == 'en' ? 'عربي' : 'English',
+                                style: const TextStyle(
+                                  color: AppColors.yellow,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
