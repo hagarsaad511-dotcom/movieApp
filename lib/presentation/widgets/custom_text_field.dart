@@ -33,16 +33,17 @@ class CustomTextField extends StatelessWidget {
       style: GoogleFonts.roboto(color: Colors.white),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.grey[850],
+        fillColor: const Color(0xFF282A28), // match screenshot
         hintText: hintText,
-        hintStyle: GoogleFonts.roboto(color: Colors.grey[500]),
-        prefixIcon: Icon(icon, color: AppColors.yellow),
+        hintStyle: GoogleFonts.roboto(color: Colors.white70),
+        prefixIcon: Icon(icon, color: Colors.white),
         suffixIcon: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
       ),
+
     );
   }
 }

@@ -2,9 +2,9 @@
 class Assets {
   Assets._();
 
-  static const String iconsus_flag = 'assets/icons/us_flag.png';
-  static const String iconseg_flag = 'assets/icons/eg_flag.png';
-  static const String iconsGoogle = 'assets/icons/google_.svg';
+  static const String iconsEG = 'assets/icons/EG.png';
+  static const String iconsLR = 'assets/icons/LR.png';
+  static const String iconsGoogle = 'assets/icons/google.png';
   static const String imagesLogin = 'assets/images/login.png';
 
 }

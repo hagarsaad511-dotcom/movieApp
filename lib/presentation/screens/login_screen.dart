@@ -7,10 +7,13 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:movie_app/l10n/gen/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/lang_button.dart';
 import '../widgets/loading_button.dart';
 import 'language_provider.dart';
 
@@ -28,6 +31,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+
+  Future<UserCredential?> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return null;
+
+      final GoogleSignInAuthentication googleAuth = await googleUser
+          .authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google Sign-In failed: $e")),
+      );
+      return null;
+    }
+  }
 
   @override
   void dispose() {
@@ -71,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     /// --- Logo ---
                     Center(
                       child: Image.asset(
-                        "assets/images/login.png",
+                        "assets/images/login.png", // replace with your logo
                         width: 120.w,
                         height: 120.h,
                       ),
@@ -87,7 +112,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value?.isEmpty ?? true) return lang.enterEmailError;
-                        if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+                        if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value!)) {
                           return lang.invalidEmailError;
                         }
                         return null;
@@ -104,7 +130,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: _obscurePassword,
                       suffix: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: Colors.white,
                         ),
                         onPressed: () {
@@ -114,7 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       validator: (value) {
-                        if (value?.isEmpty ?? true) return lang.enterPasswordError;
+                        if (value?.isEmpty ?? true)
+                          return lang.enterPasswordError;
                         if (value!.length < 6) return lang.passwordLengthError;
                         return null;
                       },
@@ -131,7 +160,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           lang.forgotPassword,
                           style: GoogleFonts.roboto(
                             color: AppColors.yellow,
-                            decoration: TextDecoration.underline,
                             fontSize: 14.sp,
                           ),
                         ),
@@ -144,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return LoadingButton(
-                          text: lang.loginButton,
+                          text: "Login",
                           isLoading: state is AuthLoading,
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
@@ -154,12 +182,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             }
                           },
+                          backgroundColor: AppColors.yellow,
+                          textColor: Colors.black,
                         );
                       },
                     ),
 
-                    SizedBox(height: 10.h),
-
+                    SizedBox(height: 20.h),
                     /// --- Sign Up link ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -173,7 +202,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(width: 6.w),
                         GestureDetector(
                           onTap: () => context.push('/register'),
-                          child: Text(
+                          child:
+                          Text(
                             lang.signUp,
                             style: GoogleFonts.roboto(
                               color: AppColors.yellow,
@@ -183,14 +213,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-
                     SizedBox(height: 20.h),
-
                     /// --- Divider with OR ---
                     Row(
                       children: [
                         Expanded(
-                          child: Divider(color: AppColors.yellow, thickness: 1),
+                          child:
+                          Divider(color: AppColors.yellow, thickness: 1),
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.w),
@@ -203,7 +232,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         Expanded(
-                          child: Divider(color: AppColors.yellow, thickness: 1),
+                          child:
+                          Divider(color: AppColors.yellow, thickness: 1),
                         ),
                       ],
                     ),
@@ -214,19 +244,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Google login not implemented yet"),
-                            ),
-                          );
+                        onPressed: () async {
+                          final user = await _signInWithGoogle();
+                          if (user != null) {
+                            context.go('/home');
+                          }
                         },
                         icon: Image.asset(
-                          "assets/icons/google_.png",
+                          "assets/icons/google.png",
                           height: 24.h,
                         ),
                         label: Text(
-                          lang.googleLogin,
+                          "Sign in with Google",
                           style: GoogleFonts.roboto(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -242,66 +271,28 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 30.h),
 
                     /// --- Language Switch ---
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Consumer<LanguageProvider>(
-                        builder: (context, langProvider, _) =>
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () => langProvider.setLang("en"),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/us_flag.png",
-                                        height: 10.h,
-                                        width: 10.w,
-                                      ),
-                                      SizedBox(width: 6.w),
-                                      Text(
-                                        "EN",
-                                        style: GoogleFonts.roboto(
-                                          color:
-                                          langProvider.currentLangCode == 'en'
-                                              ? AppColors.yellow
-                                              : Colors.grey,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: 10.w),
-                                GestureDetector(
-                                  onTap: () => langProvider.setLang("ar"),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/eg_flag.png",
-                                        height: 10.h,
-                                        width:  10.w,
-                                      ),
-                                      SizedBox(width: 6.w),
-                                      Text(
-                                        "AR",
-                                        style: GoogleFonts.roboto(
-                                          color:
-                                          langProvider.currentLangCode == 'ar'
-                                              ? AppColors.yellow
-                                              : Colors.grey,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        LangButton(
+                          langCode: "en",
+                          asset: "assets/icons/LR.png",
+                          onPressed: () {
+                            langProvider.setLang("en");
+                          },
+                        ),
+                        SizedBox(width: 10.w),
+                        LangButton(
+                          langCode: "ar",
+                          asset: "assets/icons/EG.png",
+                          onPressed: () {
+                            langProvider.setLang("ar");
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
