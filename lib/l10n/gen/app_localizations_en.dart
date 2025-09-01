@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordHint => 'Password';
 
   @override
-  String get forgotPassword => 'Forgot Password?';
+  String get forgotPassword => 'Forgot Password';
 
   @override
   String get loginButton => 'Log In';
@@ -49,4 +49,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordLengthError => 'Password must be at least 6 characters';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get avatar => 'Avatar';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get alreadyHaveAccount => 'Already Have Account?';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get enterNameError => 'Enter your name';
+
+  @override
+  String get enterPhoneError => 'Enter phone number';
+
+  @override
+  String get passwordsNotMatch => 'Passwords do not match';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Enter your email address to reset your password';
+
+  @override
+  String get sendResetLink => 'Verify Email';
+
+  @override
+  String get backToLogin => 'Back to Login';
+
+  @override
+  String get emailSent => 'Email Sent';
+
+  @override
+  String get resetEmailSent =>
+      'We\'ve sent a password reset link to your email address';
 }

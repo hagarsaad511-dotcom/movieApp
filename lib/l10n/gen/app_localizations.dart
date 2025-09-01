@@ -125,7 +125,7 @@ abstract class AppLocalizations {
   /// No description provided for @forgotPassword.
   ///
   /// In en, this message translates to:
-  /// **'Forgot Password?'**
+  /// **'Forgot Password'**
   String get forgotPassword;
 
   /// No description provided for @loginButton.
@@ -181,6 +181,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password must be at least 6 characters'**
   String get passwordLengthError;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @avatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get avatar;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already Have Account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @enterNameError.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get enterNameError;
+
+  /// No description provided for @enterPhoneError.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter phone number'**
+  String get enterPhoneError;
+
+  /// No description provided for @passwordsNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsNotMatch;
+
+  /// No description provided for @forgotPasswordDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address to reset your password'**
+  String get forgotPasswordDescription;
+
+  /// No description provided for @sendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Email'**
+  String get sendResetLink;
+
+  /// No description provided for @backToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Login'**
+  String get backToLogin;
+
+  /// No description provided for @emailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Sent'**
+  String get emailSent;
+
+  /// No description provided for @resetEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve sent a password reset link to your email address'**
+  String get resetEmailSent;
 }
 
 class _AppLocalizationsDelegate

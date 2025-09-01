@@ -21,7 +21,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get passwordHint => 'كلمة المرور';
 
   @override
-  String get forgotPassword => 'هل نسيت كلمة المرور؟';
+  String get forgotPassword => 'نسيت كلمة المرور';
 
   @override
   String get loginButton => 'تسجيل الدخول';
@@ -50,4 +50,60 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get passwordLengthError =>
       'يجب أن تتكوّن كلمة المرور من 6 أحرف على الأقل';
+
+  @override
+  String get register => 'تسجيل';
+
+  @override
+  String get avatar => 'الصورة الشخصية';
+
+  @override
+  String get name => 'الاسم';
+
+  @override
+  String get email => 'البريد الإلكتروني';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get phoneNumber => 'رقم الهاتف';
+
+  @override
+  String get createAccount => 'إنشاء حساب';
+
+  @override
+  String get alreadyHaveAccount => 'هل لديك حساب بالفعل؟';
+
+  @override
+  String get login => 'تسجيل الدخول';
+
+  @override
+  String get enterNameError => 'الرجاء إدخال الاسم';
+
+  @override
+  String get enterPhoneError => 'الرجاء إدخال رقم الهاتف';
+
+  @override
+  String get passwordsNotMatch => 'كلمات المرور غير متطابقة';
+
+  @override
+  String get forgotPasswordDescription =>
+      'أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور';
+
+  @override
+  String get sendResetLink => 'إرسال رابط التعيين';
+
+  @override
+  String get backToLogin => 'العودة لتسجيل الدخول';
+
+  @override
+  String get emailSent => 'تم إرسال البريد';
+
+  @override
+  String get resetEmailSent =>
+      'لقد أرسلنا رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني';
 }
