@@ -31,3 +31,8 @@ class AuthError extends AuthState {
   @override
   List<Object> get props => [message];
 }
+class AuthSuccess extends AuthState { // Add this
+  final String message;
+
+  AuthSuccess(this.message);
+}

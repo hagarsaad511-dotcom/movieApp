@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,20 +67,20 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases
+  // Use cases - FIXED: Register all use cases properly
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
-  sl.registerLazySingleton(() => ResetPasswordUseCase(sl<AuthRepository>()));
+  sl.registerLazySingleton(() => ForgotPasswordUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => UpdateProfileUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => IsLoggedInUseCase(sl<AuthRepository>()));
 
-  // Cubit
+  // Cubit - FIXED: Add all required use cases
   sl.registerFactory<AuthCubit>(() => AuthCubit(
     sl<LoginUseCase>(),
     sl<RegisterUseCase>(),
-    sl<ResetPasswordUseCase>(),
+    sl<ForgotPasswordUseCase>(),
     sl<UpdateProfileUseCase>(),
   ));
 }

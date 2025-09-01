@@ -14,13 +14,22 @@ class AuthRepositoryImpl implements AuthRepository {
   final LocalDataSource localDataSource;
   final SharedPreferences sharedPreferences;
   final InternetConnectionChecker connectionChecker;
-  AuthRepositoryImpl(this.remoteDataSource, this.localDataSource,{required this.sharedPreferences, required this.connectionChecker,});
+
+  AuthRepositoryImpl(
+      this.remoteDataSource,
+      this.localDataSource, {
+        required this.sharedPreferences,
+        required this.connectionChecker,
+      });
 
   @override
   Future<Either<Failure, User>> login({
     required String email,
     required String password,
   }) async {
+    if (!await connectionChecker.hasConnection) {
+      return Left(NetworkFailure('No internet connection'));
+    }
     try {
       final request = LoginRequest(email: email, password: password);
       final response = await remoteDataSource.login(request);
@@ -41,17 +50,25 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
     required String passwordConfirmation,
+    required String lang,
+    String? avatar,
   }) async {
+    if (!await connectionChecker.hasConnection) {
+      return Left(NetworkFailure('No internet connection'));
+    }
     try {
       final request = RegisterRequest(
         name: name,
         email: email,
         password: password,
         passwordConfirmation: passwordConfirmation,
+        lang: lang,
+        avatar: avatar,
       );
+
       final response = await remoteDataSource.register(request);
 
-      // Save token and user locally
+      // Persist auth token & user locally
       await localDataSource.saveAuthToken(response.token);
       await localDataSource.saveUser(response.user);
 
@@ -62,17 +79,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> resetPassword({
-    required String email,
-  }) async {
+  Future<Either<Failure, void>> forgotPassword({required String email}) async {
+    if (!await connectionChecker.hasConnection) {
+      return Left(NetworkFailure('No internet connection'));
+    }
     try {
-      final request = ResetPasswordRequest(email: email);
-      await remoteDataSource.resetPassword(request);
+      final request = ForgotPasswordRequest(email: email);
+      await remoteDataSource.forgotPassword(request);
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
+
 
   @override
   Future<Either<Failure, User>> updateProfile({
@@ -80,6 +99,9 @@ class AuthRepositoryImpl implements AuthRepository {
     String? email,
     String? avatar,
   }) async {
+    if (!await connectionChecker.hasConnection) {
+      return Left(NetworkFailure('No internet connection'));
+    }
     try {
       final request = UpdateProfileRequest(
         name: name,
@@ -101,10 +123,10 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User?>> getCurrentUser() async {
     try {
       final userModel = await localDataSource.getUser();
-      if (userModel != null) {
-        return Right(_mapUserModelToUser(userModel));
+      if (userModel == null) {
+        return const Right(null);
       }
-      return const Right(null);
+      return Right(_mapUserModelToUser(userModel));
     } catch (e) {
       return Left(CacheFailure(e.toString()));
     }
@@ -113,8 +135,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      await localDataSource.removeAuthToken();
-      await localDataSource.removeUser();
+      await localDataSource.clearAuthData();
       return const Right(null);
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -127,12 +148,13 @@ class AuthRepositoryImpl implements AuthRepository {
     return token != null && token.isNotEmpty;
   }
 
-  User _mapUserModelToUser(UserModel userModel) {
+  // Mapper from UserModel → domain User
+  User _mapUserModelToUser(UserModel model) {
     return User(
-      id: userModel.id,
-      name: userModel.name,
-      email: userModel.email,
-      avatar: userModel.avatar,
+      id: model.id,
+      name: model.name,
+      email: model.email,
+      avatar: model.avatar,
     );
   }
 }

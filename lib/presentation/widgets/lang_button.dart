@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../ui/core/themes/app_colors.dart';
-import '../screens/language_provider.dart'; // <-- update path if yours differs
 
 class LangButton extends StatelessWidget {
   final String langCode;
   final String asset;
+  final bool isSelected; // Receive selection state from parent
   final VoidCallback? onPressed;
 
   // Customization
-  final double size; // flag size
-  final double padding; // inner padding
+  final double size;
+  final double padding;
   final Color selectedBorderColor;
   final Color unselectedBorderColor;
   final double selectedBorderWidth;
@@ -22,6 +21,7 @@ class LangButton extends StatelessWidget {
     Key? key,
     required this.langCode,
     required this.asset,
+    required this.isSelected, // Required parameter
     this.onPressed,
     this.size = 30,
     this.padding = 6,
@@ -33,23 +33,10 @@ class LangButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use current app locale instead of a provider field that may not exist
-    final String currentCode = Localizations.localeOf(context).languageCode;
-    final bool isSelected = currentCode == langCode;
-
-    // We only need the provider to change language, not to listen for rebuilds
-    final langProvider = context.read<LanguageProvider>();
-
     return GestureDetector(
-      onTap: () {
-        if (onPressed != null) {
-          onPressed!();
-        } else {
-          langProvider.setLang(langCode);
-        }
-      },
+      onTap: onPressed,
       child: Container(
-        padding: EdgeInsets.all(padding.r), // radius-friendly scaling
+        padding: EdgeInsets.all(padding.r),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(

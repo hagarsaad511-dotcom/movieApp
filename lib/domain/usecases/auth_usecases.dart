@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../ui/core/error/failures';
 import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
-
+@injectable
 class LoginUseCase {
   final AuthRepository repository;
 
@@ -16,7 +17,7 @@ class LoginUseCase {
     return await repository.login(email: email, password: password);
   }
 }
-
+@injectable
 class RegisterUseCase {
   final AuthRepository repository;
 
@@ -27,28 +28,33 @@ class RegisterUseCase {
     required String email,
     required String password,
     required String passwordConfirmation,
+    required String lang,
+    String? avatar,
   }) async {
     return await repository.register(
       name: name,
       email: email,
       password: password,
       passwordConfirmation: passwordConfirmation,
+      lang: lang,
+      avatar: avatar,
     );
   }
 }
-
-class ResetPasswordUseCase {
+@injectable
+class ForgotPasswordUseCase {
   final AuthRepository repository;
 
-  ResetPasswordUseCase(this.repository);
+  ForgotPasswordUseCase(this.repository);
 
   Future<Either<Failure, void>> call({
     required String email,
   }) async {
-    return await repository.resetPassword(email: email);
+    return await repository.forgotPassword(email: email); // Fixed: remove try-catch, let repository handle it
   }
 }
 
+@injectable
 class UpdateProfileUseCase {
   final AuthRepository repository;
 
@@ -67,6 +73,7 @@ class UpdateProfileUseCase {
   }
 }
 
+@injectable
 class GetCurrentUserUseCase {
   final AuthRepository repository;
 
@@ -77,6 +84,7 @@ class GetCurrentUserUseCase {
   }
 }
 
+@injectable
 class LogoutUseCase {
   final AuthRepository repository;
 
@@ -87,6 +95,7 @@ class LogoutUseCase {
   }
 }
 
+@injectable
 class IsLoggedInUseCase {
   final AuthRepository repository;
 

@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 
 part 'auth_models.g.dart';
 
+/// --------------------
+/// UserModel
+/// --------------------
 @JsonSerializable()
 class UserModel extends Equatable {
   final int id;
@@ -26,6 +29,9 @@ class UserModel extends Equatable {
   List<Object?> get props => [id, name, email, avatar];
 }
 
+/// --------------------
+/// LoginRequest
+/// --------------------
 @JsonSerializable()
 class LoginRequest extends Equatable {
   final String email;
@@ -45,6 +51,9 @@ class LoginRequest extends Equatable {
   List<Object> get props => [email, password];
 }
 
+/// --------------------
+/// LoginResponse
+/// --------------------
 @JsonSerializable()
 class LoginResponse extends Equatable {
   final String token;
@@ -64,6 +73,9 @@ class LoginResponse extends Equatable {
   List<Object> get props => [token, user];
 }
 
+/// --------------------
+/// RegisterRequest
+/// --------------------
 @JsonSerializable()
 class RegisterRequest extends Equatable {
   final String name;
@@ -71,12 +83,16 @@ class RegisterRequest extends Equatable {
   final String password;
   @JsonKey(name: 'password_confirmation')
   final String passwordConfirmation;
+  final String lang;
+  final String? avatar;
 
   const RegisterRequest({
     required this.name,
     required this.email,
     required this.password,
     required this.passwordConfirmation,
+    required this.lang,
+    this.avatar,
   });
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) =>
@@ -85,9 +101,13 @@ class RegisterRequest extends Equatable {
   Map<String, dynamic> toJson() => _$RegisterRequestToJson(this);
 
   @override
-  List<Object> get props => [name, email, password, passwordConfirmation];
+  List<Object?> get props =>
+      [name, email, password, passwordConfirmation, lang, avatar];
 }
 
+/// --------------------
+/// RegisterResponse
+/// --------------------
 @JsonSerializable()
 class RegisterResponse extends Equatable {
   final String token;
@@ -107,23 +127,23 @@ class RegisterResponse extends Equatable {
   List<Object> get props => [token, user];
 }
 
+/// --------------------
+/// ResetPasswordRequest
+/// --------------------
 @JsonSerializable()
-class ResetPasswordRequest extends Equatable {
+class ForgotPasswordRequest {
   final String email;
 
-  const ResetPasswordRequest({
-    required this.email,
-  });
+  ForgotPasswordRequest({required this.email});
 
-  factory ResetPasswordRequest.fromJson(Map<String, dynamic> json) =>
-      _$ResetPasswordRequestFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ResetPasswordRequestToJson(this);
-
-  @override
-  List<Object> get props => [email];
+  Map<String, dynamic> toJson() => {
+    'email': email,
+  };
 }
 
+/// --------------------
+/// UpdateProfileRequest
+/// --------------------
 @JsonSerializable()
 class UpdateProfileRequest extends Equatable {
   final String? name;

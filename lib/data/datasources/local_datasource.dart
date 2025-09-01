@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/auth_models.dart';
 
-
 abstract class LocalDataSource {
   Future<void> saveAuthToken(String token);
   Future<String?> getAuthToken();
@@ -12,6 +11,8 @@ abstract class LocalDataSource {
   Future<UserModel?> getUser();
   Future<void> removeUser();
 
+  /// Clear all local auth-related data
+  Future<void> clearAuthData();
 }
 
 class LocalDataSourceImpl implements LocalDataSource {
@@ -21,9 +22,6 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   static const String _authTokenKey = 'auth_token';
   static const String _userKey = 'user_data';
-  static const String _favoritesKey = 'favorite_movies';
-  static const String _historyKey = 'watch_history';
-  static const String _cachedMoviesKey = 'cached_movies';
 
   @override
   Future<void> saveAuthToken(String token) async {
@@ -58,6 +56,12 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<void> removeUser() async {
+    await sharedPreferences.remove(_userKey);
+  }
+
+  @override
+  Future<void> clearAuthData() async {
+    await sharedPreferences.remove(_authTokenKey);
     await sharedPreferences.remove(_userKey);
   }
 }

@@ -8,13 +8,13 @@ import 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;
-  final ResetPasswordUseCase _resetPasswordUseCase;
+  final ForgotPasswordUseCase _forgotPasswordUseCase; // Add this
   final UpdateProfileUseCase _updateProfileUseCase;
 
   AuthCubit(
       this._loginUseCase,
       this._registerUseCase,
-      this._resetPasswordUseCase,
+      this._forgotPasswordUseCase, // Add this parameter
       this._updateProfileUseCase,
       ) : super(AuthInitial());
 
@@ -37,6 +37,8 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
     required String passwordConfirmation,
+    required String lang,
+    String? avatar,
   }) async {
     emit(AuthLoading());
 
@@ -45,6 +47,8 @@ class AuthCubit extends Cubit<AuthState> {
       email: email,
       password: password,
       passwordConfirmation: passwordConfirmation,
+      lang: lang,
+      avatar: avatar,
     );
 
     result.fold(
@@ -53,14 +57,16 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  Future<void> resetPassword({required String email}) async {
+
+
+  Future<void> forgotPassword({required String email}) async {
     emit(AuthLoading());
 
-    final result = await _resetPasswordUseCase(email: email);
+    final result = await _forgotPasswordUseCase(email: email);
 
     result.fold(
           (failure) => emit(AuthError(failure.message)),
-          (_) => emit(AuthUnauthenticated()),
+          (_) => emit(AuthSuccess('Password reset email sent successfully')),
     );
   }
 

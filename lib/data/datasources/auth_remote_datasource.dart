@@ -1,10 +1,15 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as client;
+
+import '../../ui/constants/api_constants.dart';
 import '../../ui/core/network/api_service.dart';
 import '../models/auth_models.dart';
 
 abstract class AuthRemoteDataSource {
   Future<LoginResponse> login(LoginRequest request);
   Future<RegisterResponse> register(RegisterRequest request);
-  Future<void> resetPassword(ResetPasswordRequest request);
+  Future<void> forgotPassword(ForgotPasswordRequest request);
   Future<UserModel> updateProfile(UpdateProfileRequest request);
 }
 
@@ -32,11 +37,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> resetPassword(ResetPasswordRequest request) async {
-    try {
-      return await apiService.resetPassword(request);
-    } catch (e) {
-      throw Exception('Failed to reset password: $e');
+  Future<void> forgotPassword(ForgotPasswordRequest request) async {
+    final response = await client.post(
+      Uri.parse('${ApiConstants.authBaseUrl}${ApiConstants.resetPassword}'),
+      body: json.encode(request.toJson()),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to send reset password email');
     }
   }
 

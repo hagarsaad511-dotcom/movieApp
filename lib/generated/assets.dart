@@ -3,8 +3,11 @@ class Assets {
   Assets._();
 
   static const String iconsEG = 'assets/icons/EG.png';
-  static const String iconsLR = 'assets/icons/LR.png';
   static const String iconsGoogle = 'assets/icons/google.png';
+  static const String iconsLR = 'assets/icons/LR.png';
+  static const String imagesAvatar1 = 'assets/images/avatar1.png';
+  static const String imagesAvatar2 = 'assets/images/avatar2.png';
+  static const String imagesAvatar3 = 'assets/images/avatar3.png';
   static const String imagesLogin = 'assets/images/login.png';
 
 }

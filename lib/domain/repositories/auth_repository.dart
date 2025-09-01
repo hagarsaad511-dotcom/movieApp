@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:movie_app/ui/core/error/failures';
+
+import '../../ui/core/error/failures';
 import '../entities/user.dart';
 
 abstract class AuthRepository {
@@ -13,11 +14,12 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String passwordConfirmation,
+    required String lang,
+    String? avatar,
   });
 
-  Future<Either<Failure, void>> resetPassword({
-    required String email,
-  });
+  Future<Either<Failure, void>> forgotPassword({required String email}); // Make this abstract
+
 
   Future<Either<Failure, User>> updateProfile({
     String? name,

@@ -13,7 +13,9 @@ class _ApiService implements ApiService {
     this._dio, {
     this.baseUrl,
     this.errorLogger,
-  });
+  }) {
+    baseUrl ??= 'https://your-auth-api.com/api';
+  }
 
   final Dio _dio;
 
@@ -90,7 +92,7 @@ class _ApiService implements ApiService {
   }
 
   @override
-  Future<void> resetPassword(ResetPasswordRequest request) async {
+  Future<void> resetPassword(ForgotPasswordRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};

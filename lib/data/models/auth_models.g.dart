@@ -49,6 +49,8 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String,
       password: json['password'] as String,
       passwordConfirmation: json['password_confirmation'] as String,
+      lang: json['lang'] as String,
+      avatar: json['avatar'] as String?,
     );
 
 Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
@@ -57,6 +59,8 @@ Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
       'email': instance.email,
       'password': instance.password,
       'password_confirmation': instance.passwordConfirmation,
+      'lang': instance.lang,
+      'avatar': instance.avatar,
     };
 
 RegisterResponse _$RegisterResponseFromJson(Map<String, dynamic> json) =>
@@ -71,14 +75,14 @@ Map<String, dynamic> _$RegisterResponseToJson(RegisterResponse instance) =>
       'user': instance.user,
     };
 
-ResetPasswordRequest _$ResetPasswordRequestFromJson(
+ForgotPasswordRequest _$ForgotPasswordRequestFromJson(
         Map<String, dynamic> json) =>
-    ResetPasswordRequest(
+    ForgotPasswordRequest(
       email: json['email'] as String,
     );
 
-Map<String, dynamic> _$ResetPasswordRequestToJson(
-        ResetPasswordRequest instance) =>
+Map<String, dynamic> _$ForgotPasswordRequestToJson(
+        ForgotPasswordRequest instance) =>
     <String, dynamic>{
       'email': instance.email,
     };

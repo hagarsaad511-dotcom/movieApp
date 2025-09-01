@@ -5,7 +5,7 @@ import 'package:movie_app/data/models/auth_models.dart';
 
 part 'api_service.g.dart';
 
-@RestApi()
+@RestApi(baseUrl: "https://your-auth-api.com/api")
 abstract class ApiService {
   factory ApiService(Dio dio) = _ApiService;
 
@@ -17,7 +17,7 @@ abstract class ApiService {
   Future<RegisterResponse> register(@Body() RegisterRequest request);
 
   @PATCH('/auth/reset-password')
-  Future<void> resetPassword(@Body() ResetPasswordRequest request);
+  Future<void> resetPassword(@Body() ForgotPasswordRequest request);
 
   @PUT('/auth/profile')
   Future<UserModel> updateProfile(@Body() UpdateProfileRequest request);

@@ -54,6 +54,16 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Navigate to Register Screen
+  void _navigateToRegister() {
+    try {
+      context.push('/register');
+    } catch (e) {
+      // Fallback navigation if GoRouter route doesn't exist
+      Navigator.pushNamed(context, '/register');
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -78,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: AppColors.red,
+                  backgroundColor: AppColors.ratingBgColor,
                 ),
               );
             }
@@ -189,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     SizedBox(height: 20.h),
-                    /// --- Sign Up link ---
+                    /// --- Sign Up link (CORRECTED) ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -201,9 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         SizedBox(width: 6.w),
                         GestureDetector(
-                          onTap: () => context.push('/register'),
-                          child:
-                          Text(
+                          onTap: _navigateToRegister, // Using the method now
+                          child: Text(
                             lang.signUp,
                             style: GoogleFonts.roboto(
                               color: AppColors.yellow,
@@ -280,6 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         LangButton(
                           langCode: "en",
                           asset: "assets/icons/LR.png",
+                          isSelected: langProvider.currentLangCode == "en",
                           onPressed: () {
                             langProvider.setLang("en");
                           },
@@ -288,6 +298,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         LangButton(
                           langCode: "ar",
                           asset: "assets/icons/EG.png",
+                          isSelected: langProvider.currentLangCode == "ar",
                           onPressed: () {
                             langProvider.setLang("ar");
                           },
