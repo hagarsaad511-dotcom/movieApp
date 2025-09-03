@@ -6,10 +6,10 @@ import '../../ui/core/themes/app_colors.dart';
 class LangButton extends StatelessWidget {
   final String langCode;
   final String asset;
-  final bool isSelected; // Receive selection state from parent
+  final bool isSelected;
   final VoidCallback? onPressed;
 
-  // Customization
+
   final double size;
   final double padding;
   final Color selectedBorderColor;
@@ -21,7 +21,7 @@ class LangButton extends StatelessWidget {
     Key? key,
     required this.langCode,
     required this.asset,
-    required this.isSelected, // Required parameter
+    required this.isSelected,
     this.onPressed,
     this.size = 30,
     this.padding = 6,

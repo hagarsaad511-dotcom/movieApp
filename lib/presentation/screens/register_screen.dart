@@ -59,7 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final lang = AppLocalizations.of(context)!; // Get translations
+    final lang = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -81,7 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Expanded(
                         child: Center(
                           child: Text(
-                            lang.register, // Use translation
+                            lang.register,
                             style: GoogleFonts.roboto(
                               fontSize: 22.sp,
                               fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         SizedBox(height: 8.h),
                         Text(
-                          lang.avatar, // Use translation
+                          lang.avatar,
                           style: GoogleFonts.roboto(
                             fontSize: 16.sp,
                             color: AppColors.white,
@@ -122,7 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   /// Name
                   CustomTextField(
                     controller: _nameController,
-                    hintText: lang.name, // Use translation
+                    hintText: lang.name,
                     icon: Icons.person_outline,
                     validator: (val) =>
                     val == null || val.isEmpty ? lang.enterNameError : null,
@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   /// Email
                   CustomTextField(
                     controller: _emailController,
-                    hintText: lang.email, // Use translation
+                    hintText: lang.email,
                     icon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
@@ -148,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   /// Password
                   CustomTextField(
                     controller: _passwordController,
-                    hintText: lang.password, // Use translation
+                    hintText: lang.password,
                     icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
                     suffix: IconButton(
@@ -173,7 +173,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   /// Confirm Password
                   CustomTextField(
                     controller: _confirmPasswordController,
-                    hintText: lang.confirmPassword, // Use translation
+                    hintText: lang.confirmPassword,
                     icon: Icons.lock_outline,
                     obscureText: _obscureConfirmPassword,
                     suffix: IconButton(
@@ -198,7 +198,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   /// Phone Number
                   CustomTextField(
                     controller: _phoneController,
-                    hintText: lang.phoneNumber, // Use translation
+                    hintText: lang.phoneNumber,
                     icon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                     validator: (val) =>
@@ -210,7 +210,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   BlocBuilder<AuthCubit, AuthState>(
                     builder: (context, state) {
                       return LoadingButton(
-                        text: lang.createAccount, // Use translation
+                        text: lang.createAccount,
                         isLoading: state is AuthLoading,
                         onPressed: _onSubmit,
                         backgroundColor: AppColors.yellow,
@@ -225,13 +225,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "${lang.alreadyHaveAccount} ", // Use translation
+                        "${lang.alreadyHaveAccount} ",
                         style: GoogleFonts.roboto(color: AppColors.white),
                       ),
                       GestureDetector(
                         onTap: () => context.push('/login'),
                         child: Text(
-                          lang.login, // Use translation
+                          lang.login,
                           style: GoogleFonts.roboto(
                             color: AppColors.yellow,
                             fontWeight: FontWeight.bold,

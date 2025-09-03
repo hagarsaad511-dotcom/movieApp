@@ -50,7 +50,7 @@ class ForgotPasswordUseCase {
   Future<Either<Failure, void>> call({
     required String email,
   }) async {
-    return await repository.forgotPassword(email: email); // Fixed: remove try-catch, let repository handle it
+    return await repository.forgotPassword(email: email);
   }
 }
 

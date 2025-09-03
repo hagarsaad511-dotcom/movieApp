@@ -30,13 +30,13 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
-      style: GoogleFonts.roboto(color: Colors.white),
+      style: GoogleFonts.roboto(color: AppColors.white),
       decoration: InputDecoration(
         filled: true,
-        fillColor: const Color(0xFF282A28), // match screenshot
+        fillColor: AppColors.darkGrey,
         hintText: hintText,
-        hintStyle: GoogleFonts.roboto(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white),
+        hintStyle: GoogleFonts.roboto(color: AppColors.white),
+        prefixIcon: Icon(icon, color: AppColors.white),
         suffixIcon: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),

@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       context.push('/register');
     } catch (e) {
-      // Fallback navigation if GoRouter route doesn't exist
+
       Navigator.pushNamed(context, '/register');
     }
   }
@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     /// --- Logo ---
                     Center(
                       child: Image.asset(
-                        "assets/images/login.png", // replace with your logo
+                        "assets/images/login.png",
                         width: 120.w,
                         height: 120.h,
                       ),
@@ -182,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return LoadingButton(
-                          text: "Login",
+                          text: lang.login,
                           isLoading: state is AuthLoading,
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
@@ -199,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     SizedBox(height: 20.h),
-                    /// --- Sign Up link (CORRECTED) ---
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -211,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         SizedBox(width: 6.w),
                         GestureDetector(
-                          onTap: _navigateToRegister, // Using the method now
+                          onTap: _navigateToRegister,
                           child: Text(
                             lang.signUp,
                             style: GoogleFonts.roboto(
@@ -264,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 24.h,
                         ),
                         label: Text(
-                          "Sign in with Google",
+                          lang.googleLogin,
                           style: GoogleFonts.roboto(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,

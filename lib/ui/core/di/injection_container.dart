@@ -36,7 +36,7 @@ Future<void> init() async {
       ),
     );
 
-    // Add interceptors if needed (logging, auth, etc.)
+
     dio.interceptors.add(LogInterceptor(
       requestBody: true,
       responseBody: true,
@@ -67,7 +67,7 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases - FIXED: Register all use cases properly
+  // Use cases -
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => ForgotPasswordUseCase(sl<AuthRepository>()));
@@ -76,7 +76,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => IsLoggedInUseCase(sl<AuthRepository>()));
 
-  // Cubit - FIXED: Add all required use cases
+  // Cubit -
   sl.registerFactory<AuthCubit>(() => AuthCubit(
     sl<LoginUseCase>(),
     sl<RegisterUseCase>(),

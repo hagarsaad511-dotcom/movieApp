@@ -111,7 +111,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       /// image
                       Center(
                         child: Image.asset(
-                          "assets/images/Forgot password-bro 1.png", // replace with your logo
+                          "assets/images/Forgot password-bro 1.png",
                           width: 430.w,
                           height: 430.h,
                         ),
@@ -148,13 +148,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         },
                       ),
                     ] else ...[
-                      /// Success State - Fixed alignment
+
                       Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            /// Success Icon
+
                             Icon(
                               Icons.mark_email_read_outlined,
                               size: 80.w,
@@ -162,7 +162,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                             SizedBox(height: 24.h),
 
-                            /// Success Title
+
                             Text(
                               lang.emailSent,
                               style: GoogleFonts.roboto(
@@ -174,7 +174,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                             SizedBox(height: 16.h),
 
-                            /// Success Message
+
                             Text(
                               lang.resetEmailSent,
                               style: GoogleFonts.roboto(

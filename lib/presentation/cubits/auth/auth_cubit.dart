@@ -8,13 +8,13 @@ import 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;
-  final ForgotPasswordUseCase _forgotPasswordUseCase; // Add this
+  final ForgotPasswordUseCase _forgotPasswordUseCase;
   final UpdateProfileUseCase _updateProfileUseCase;
 
   AuthCubit(
       this._loginUseCase,
       this._registerUseCase,
-      this._forgotPasswordUseCase, // Add this parameter
+      this._forgotPasswordUseCase,
       this._updateProfileUseCase,
       ) : super(AuthInitial());
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AvatarPicker extends StatefulWidget {
-  final Function(String) onAvatarSelected; // returns the selected avatar path
+  final Function(String) onAvatarSelected;
 
   const AvatarPicker({super.key, required this.onAvatarSelected});
 
@@ -14,7 +14,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
 
   final PageController _pageController = PageController(viewportFraction: 0.35);
 
-  // Example default avatars (place them in assets/images/avatars/)
+
   final List<String> _defaultAvatars = [
     "assets/images/avatar1.png",
     "assets/images/avatar2.png",
@@ -25,7 +25,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
   @override
   void initState() {
     super.initState();
-    _selectedAvatar = _defaultAvatars[0]; // default first avatar
+    _selectedAvatar = _defaultAvatars[0];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onAvatarSelected(_selectedAvatar!);
     });
@@ -34,7 +34,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 120, // enough space for zoomed avatar
+      height: 120,
       child: PageView.builder(
         controller: _pageController,
         itemCount: _defaultAvatars.length,
@@ -51,13 +51,13 @@ class _AvatarPickerState extends State<AvatarPicker> {
               double value = 1.0;
               if (_pageController.position.haveDimensions) {
                 value = (_pageController.page! - index).abs();
-                value = (1 - (value * 0.3)).clamp(0.7, 1.0); // scale effect
+                value = (1 - (value * 0.3)).clamp(0.7, 1.0);
               }
               return Center(
                 child: Transform.scale(
                   scale: value,
                   child: CircleAvatar(
-                    radius: 40,
+                    radius: 70,
                     backgroundImage: AssetImage(_defaultAvatars[index]),
                   ),
                 ),
