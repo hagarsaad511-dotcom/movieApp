@@ -52,6 +52,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String passwordConfirmation,
     required String lang,
     String? avatar,
+    String? phone,
   }) async {
     if (!await connectionChecker.hasConnection) {
       return Left(NetworkFailure('No internet connection'));
@@ -64,6 +65,7 @@ class AuthRepositoryImpl implements AuthRepository {
         passwordConfirmation: passwordConfirmation,
         lang: lang,
         avatar: avatar,
+        phone: phone,
       );
 
       final response = await remoteDataSource.register(request);
@@ -92,12 +94,12 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-
   @override
   Future<Either<Failure, User>> updateProfile({
     String? name,
     String? email,
     String? avatar,
+    String? phone,
   }) async {
     if (!await connectionChecker.hasConnection) {
       return Left(NetworkFailure('No internet connection'));
@@ -107,6 +109,7 @@ class AuthRepositoryImpl implements AuthRepository {
         name: name,
         email: email,
         avatar: avatar,
+        phone: phone,
       );
       final updatedUser = await remoteDataSource.updateProfile(request);
 
@@ -117,6 +120,17 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
+  }
+
+  // Mapper from UserModel → domain User
+  User _mapUserModelToUser(UserModel model) {
+    return User(
+      id: model.id,
+      name: model.name,
+      email: model.email,
+      avatar: model.avatar,
+      phone: model.phone,
+    );
   }
 
   @override
@@ -148,13 +162,21 @@ class AuthRepositoryImpl implements AuthRepository {
     return token != null && token.isNotEmpty;
   }
 
-  // Mapper from UserModel → domain User
-  User _mapUserModelToUser(UserModel model) {
-    return User(
-      id: model.id,
-      name: model.name,
-      email: model.email,
-      avatar: model.avatar,
-    );
+  @override
+  Future<Either<Failure, void>> deleteAccount() async {
+    if (!await connectionChecker.hasConnection) {
+      // Fallback for dev/demo mode — clear local user
+      await localDataSource.clearAuthData();
+      return const Right(null);
+    }
+    try {
+      await remoteDataSource.deleteAccount();
+      await localDataSource.clearAuthData();
+      return const Right(null);
+    } catch (e) {
+      // In dev, clear local even if API fails
+      await localDataSource.clearAuthData();
+      return Left(ServerFailure('Failed to delete account: $e'));
+    }
   }
 }

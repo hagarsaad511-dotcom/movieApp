@@ -2,12 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:movie_app/data/models/auth_models.dart';
 
-
 part 'api_service.g.dart';
 
 @RestApi(baseUrl: "https://your-auth-api.com/api")
 abstract class ApiService {
-  factory ApiService(Dio dio) = _ApiService;
+  factory ApiService(Dio dio, {String baseUrl}) = _ApiService;
 
   // Auth endpoints
   @POST('/auth/login')
@@ -22,4 +21,7 @@ abstract class ApiService {
   @PUT('/auth/profile')
   Future<UserModel> updateProfile(@Body() UpdateProfileRequest request);
 
+  /// Delete the current user account
+  @DELETE('/auth/delete')
+  Future<void> deleteAccount();
 }

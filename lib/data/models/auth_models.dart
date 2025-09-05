@@ -12,17 +12,24 @@ class UserModel extends Equatable {
   final String name;
   final String email;
   final String? avatar;
+  final String? phone;
 
-  const UserModel({
+  UserModel({
     required this.id,
     required this.name,
     required this.email,
     this.avatar,
+    this.phone,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
 
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+    id: json['id'],
+    name: json['name'],
+    email: json['email'],
+    avatar: json['avatar'],
+    phone: json['phone'],
+  );
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   @override
@@ -85,6 +92,7 @@ class RegisterRequest extends Equatable {
   final String passwordConfirmation;
   final String lang;
   final String? avatar;
+  final String? phone;
 
   const RegisterRequest({
     required this.name,
@@ -93,6 +101,7 @@ class RegisterRequest extends Equatable {
     required this.passwordConfirmation,
     required this.lang,
     this.avatar,
+    this.phone
   });
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) =>
@@ -149,18 +158,20 @@ class UpdateProfileRequest extends Equatable {
   final String? name;
   final String? email;
   final String? avatar;
+  final String? phone;
 
-  const UpdateProfileRequest({
-    this.name,
-    this.email,
-    this.avatar,
-  });
+  UpdateProfileRequest({this.name, this.email, this.avatar, this.phone});
+
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateProfileRequestFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UpdateProfileRequestToJson(this);
-
+  Map<String, dynamic> toJson() => {
+    if (name != null) 'name': name,
+    if (email != null) 'email': email,
+    if (avatar != null) 'avatar': avatar,
+    if (phone != null) 'phone': phone, // ✅
+  };
   @override
   List<Object?> get props => [name, email, avatar];
 }

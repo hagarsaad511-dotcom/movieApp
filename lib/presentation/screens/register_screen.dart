@@ -42,8 +42,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         passwordConfirmation: _confirmPasswordController.text.trim(),
-        lang: langProvider.currentLangCode,
-        avatar: _selectedAvatarPath?? '',
+        lang: langProvider.currentLangCode.trim(),
+        avatar: _selectedAvatarPath?.trim(),
+        phone: _phoneController.text.trim(),
       );
     }
   }

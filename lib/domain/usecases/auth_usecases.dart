@@ -30,6 +30,7 @@ class RegisterUseCase {
     required String passwordConfirmation,
     required String lang,
     String? avatar,
+    String? phone,
   }) async {
     return await repository.register(
       name: name,
@@ -38,6 +39,7 @@ class RegisterUseCase {
       passwordConfirmation: passwordConfirmation,
       lang: lang,
       avatar: avatar,
+      phone: phone,
     );
   }
 }
@@ -64,11 +66,13 @@ class UpdateProfileUseCase {
     String? name,
     String? email,
     String? avatar,
+    String? phone,
   }) async {
     return await repository.updateProfile(
       name: name,
       email: email,
       avatar: avatar,
+      phone: phone,
     );
   }
 }
@@ -105,3 +109,13 @@ class IsLoggedInUseCase {
     return await repository.isLoggedIn();
   }
 }
+
+@injectable
+class DeleteAccountUseCase {
+    final AuthRepository repository;
+    DeleteAccountUseCase(this.repository);
+
+    Future<Either<Failure, void>> call() async{
+      return await repository.deleteAccount();
+    }
+  }

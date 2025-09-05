@@ -11,6 +11,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       name: json['name'] as String,
       email: json['email'] as String,
       avatar: json['avatar'] as String?,
+      phone: json['phone'] as String?,
     );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -18,6 +19,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'name': instance.name,
       'email': instance.email,
       'avatar': instance.avatar,
+      'phone': instance.phone,
     };
 
 LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) => LoginRequest(
@@ -51,6 +53,7 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
       passwordConfirmation: json['password_confirmation'] as String,
       lang: json['lang'] as String,
       avatar: json['avatar'] as String?,
+      phone: json['phone'] as String?,
     );
 
 Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
@@ -61,6 +64,7 @@ Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
       'password_confirmation': instance.passwordConfirmation,
       'lang': instance.lang,
       'avatar': instance.avatar,
+      'phone': instance.phone,
     };
 
 RegisterResponse _$RegisterResponseFromJson(Map<String, dynamic> json) =>
@@ -93,6 +97,7 @@ UpdateProfileRequest _$UpdateProfileRequestFromJson(
       name: json['name'] as String?,
       email: json['email'] as String?,
       avatar: json['avatar'] as String?,
+      phone: json['phone'] as String?,
     );
 
 Map<String, dynamic> _$UpdateProfileRequestToJson(
@@ -101,4 +106,5 @@ Map<String, dynamic> _$UpdateProfileRequestToJson(
       'name': instance.name,
       'email': instance.email,
       'avatar': instance.avatar,
+      'phone': instance.phone,
     };

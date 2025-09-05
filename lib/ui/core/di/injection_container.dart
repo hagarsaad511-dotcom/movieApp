@@ -75,6 +75,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => IsLoggedInUseCase(sl<AuthRepository>()));
+  sl.registerLazySingleton(() => DeleteAccountUseCase(sl<AuthRepository>()));
+
 
   // Cubit -
   sl.registerFactory<AuthCubit>(() => AuthCubit(
@@ -82,5 +84,9 @@ Future<void> init() async {
     sl<RegisterUseCase>(),
     sl<ForgotPasswordUseCase>(),
     sl<UpdateProfileUseCase>(),
+    sl<GetCurrentUserUseCase>(),
+    sl<LogoutUseCase>(),
+    sl<DeleteAccountUseCase>(),
   ));
+
 }

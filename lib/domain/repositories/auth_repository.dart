@@ -16,6 +16,7 @@ abstract class AuthRepository {
     required String passwordConfirmation,
     required String lang,
     String? avatar,
+    String?phone,
   });
 
   Future<Either<Failure, void>> forgotPassword({required String email}); // Make this abstract
@@ -25,11 +26,15 @@ abstract class AuthRepository {
     String? name,
     String? email,
     String? avatar,
+    String? phone,
   });
+
 
   Future<Either<Failure, User?>> getCurrentUser();
 
   Future<Either<Failure, void>> logout();
 
   Future<bool> isLoggedIn();
+
+  Future<Either<Failure, void>> deleteAccount();
 }
