@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/presentation/widgets/avatar_picker.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../ui/core/utils/validators.dart';
 
 import '../../l10n/gen/app_localizations.dart';
 import '../cubits/auth/auth_cubit.dart';
@@ -12,7 +14,7 @@ import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/lang_button.dart';
 import '../widgets/loading_button.dart';
-import '../widgets/avatar_picker.dart';
+import '../widgets/avatar_grid.dart';
 import 'language_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -98,16 +100,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 20.h),
 
-                  /// Avatar Picker
+                  /// Avatar Picker (Grid of avatars → emits int avatarId)
                   Center(
                     child: Column(
                       children: [
-                        AvatarPicker(
-                          onAvatarSelected: (avatarId) {
-                            setState(() {
-                              _selectedAvatarId = avatarId;
-                            });
-                          },
+                        SizedBox(
+                          height: 220.h,
+                          child: AvatarPicker(
+                            onAvatarSelected: (avatarId) {
+                              setState(() {
+                                _selectedAvatarId = avatarId;
+                              });
+                            },
+                          ),
                         ),
                         SizedBox(height: 8.h),
                         Text(
@@ -138,28 +143,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hintText: lang.email,
                     icon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
-                    validator: (val) {
-                      if (val == null || val.isEmpty) return lang.enterEmailError;
-                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(val)) {
-                        return lang.invalidEmailError;
-                      }
-                      return null;
-                    },
+                    validator: (val) => Validators.validateEmail(
+                      val,
+                      emptyMsg: lang.enterEmailError,
+                      invalidMsg: lang.invalidEmailError,
+                    ),
                   ),
                   SizedBox(height: 16.h),
-
 
                   /// Password
                   CustomTextField(
                     controller: _passwordController,
-                    hintText: lang.password,
+                    hintText: lang.passwordHint,
                     icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
                     suffix: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                        color: AppColors.white,
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.white,
                       ),
                       onPressed: () {
                         setState(() {
@@ -167,18 +170,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         });
                       },
                     ),
-                    validator: (val) {
-                      if (val == null || val.isEmpty) return lang.enterPasswordError;
-                      if (val.length < 8) return lang.passwordLengthError;
-
-                       final regex =
-                      RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
-                      if (!regex.hasMatch(val)) {
-                        return "Password must include uppercase, lowercase, number, and special character";
-                      }
-
-                      return null;
-                    },
+                    validator: (val) => Validators.validatePassword(
+                      val,
+                      emptyMsg: lang.enterPasswordError,
+                      lengthMsg: lang.passwordLengthError,
+                    ),
                   ),
                   SizedBox(height: 16.h),
 
@@ -190,8 +186,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: _obscureConfirmPassword,
                     suffix: IconButton(
                       icon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                        color: AppColors.white,
+                        _obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.white,
                       ),
                       onPressed: () {
                         setState(() {
@@ -199,27 +197,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         });
                       },
                     ),
-                    validator: (val) {
-                      if (val == null || val.isEmpty) return "Confirm your password";
-                      if (val != _passwordController.text) return lang.passwordsNotMatch;
-                      return null;
-                    },
+                    validator: (val) => Validators.validateConfirmPassword(
+                      val,
+                      _passwordController.text,
+                      mismatchMsg: lang.passwordsNotMatch,
+                    ),
                   ),
                   SizedBox(height: 16.h),
 
-                  /// Phone Number
+                  /// Phone
                   CustomTextField(
                     controller: _phoneController,
                     hintText: lang.phoneNumber,
                     icon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
-                    validator: (val) {
-                      if (val == null || val.isEmpty) return lang.enterPhoneError;
-                      if (!RegExp(r'^[0-9]{11}$').hasMatch(val)) {
-                        return "Phone number must be exactly 11 digits";
-                      }
-                      return null;
-                    },
+                    validator: (val) => Validators.validatePhone(
+                      val,
+                      emptyMsg: lang.enterPhoneError,
+                    ),
                   ),
 
                   SizedBox(height: 24.h),

@@ -10,6 +10,7 @@ import 'package:movie_app/l10n/gen/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../ui/core/utils/validators.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
@@ -120,14 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: lang.emailHint,
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) return lang.enterEmailError;
-                        if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value!)) {
-                          return lang.invalidEmailError;
-                        }
-                        return null;
-                      },
+                      validator: (val) => Validators.validateEmail(val,
+                          emptyMsg: lang.enterEmailError, invalidMsg: lang.invalidEmailError),
                     ),
 
                     SizedBox(height: 20.h),
@@ -151,12 +146,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
                         },
                       ),
-                      validator: (value) {
-                        if (value?.isEmpty ?? true)
-                          return lang.enterPasswordError;
-                        if (value!.length < 6) return lang.passwordLengthError;
-                        return null;
-                      },
+                      validator: (val) => Validators.validatePassword(val,
+                          emptyMsg: lang.enterPasswordError, lengthMsg: lang.passwordLengthError),
                     ),
 
                     SizedBox(height: 12.h),

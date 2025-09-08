@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/gen/app_localizations.dart';
 import '../../ui/core/themes/app_colors.dart';
+import '../../ui/core/utils/validators.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
@@ -125,13 +126,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         hintText: lang.email,
                         icon: Icons.email_outlined,
                         keyboardType: TextInputType.emailAddress,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) return lang.enterEmailError;
-                          if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
-                            return lang.invalidEmailError;
-                          }
-                          return null;
-                        },
+                        validator: (val) => Validators.validateEmail(val,
+                            emptyMsg: lang.enterEmailError, invalidMsg: lang.invalidEmailError),
                       ),
                       SizedBox(height: 24.h),
 
