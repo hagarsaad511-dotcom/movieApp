@@ -23,31 +23,15 @@ Future<void> init() async {
         () => InternetConnectionChecker(),
   );
 
-  // Dio client
-  sl.registerLazySingleton<Dio>(() {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: "https://route-movie-apis.vercel.app/", // TODO: replace with real base URL
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      ),
-    );
+  // Authenticated Dio with token
+  sl.registerLazySingleton<Dio>(
+        () => DioClient.createAuthDio(sharedPreferences),
+  );
 
-
-    dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-    ));
-
-    return dio;
-  });
-
-  // ApiService
-  sl.registerLazySingleton<ApiService>(() => ApiService(sl<Dio>()));
+  // ApiService (Retrofit)
+  sl.registerLazySingleton<ApiService>(
+        () => ApiService(sl<Dio>()),
+  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -68,7 +52,7 @@ Future<void> init() async {
     ),
   );
 
-  // Use cases -
+  // Use cases
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => ForgotPasswordUseCase(sl<AuthRepository>()));
@@ -78,16 +62,16 @@ Future<void> init() async {
   sl.registerLazySingleton(() => IsLoggedInUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => DeleteAccountUseCase(sl<AuthRepository>()));
 
-
-  // Cubit -
-  sl.registerFactory<AuthCubit>(() => AuthCubit(
-    sl<LoginUseCase>(),
-    sl<RegisterUseCase>(),
-    sl<ForgotPasswordUseCase>(),
-    sl<UpdateProfileUseCase>(),
-    sl<GetCurrentUserUseCase>(),
-    sl<LogoutUseCase>(),
-    sl<DeleteAccountUseCase>(),
-  ));
-
+  // Cubit
+  sl.registerFactory<AuthCubit>(
+        () => AuthCubit(
+      sl<LoginUseCase>(),
+      sl<RegisterUseCase>(),
+      sl<ForgotPasswordUseCase>(),
+      sl<UpdateProfileUseCase>(),
+      sl<GetCurrentUserUseCase>(),
+      sl<LogoutUseCase>(),
+      sl<DeleteAccountUseCase>(),
+    ),
+  );
 }

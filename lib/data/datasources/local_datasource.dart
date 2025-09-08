@@ -40,6 +40,7 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<void> saveUser(UserModel user) async {
+    // 🔑 Includes avatarId & phone inside JSON
     final userJson = json.encode(user.toJson());
     await sharedPreferences.setString(_userKey, userJson);
   }

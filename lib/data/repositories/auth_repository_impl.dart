@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../../ui/core/error/failures';
+import '../../ui/core/error/failures.dart';
 import '../datasources/auth_remote_datasource.dart';
 import '../datasources/local_datasource.dart';
 import '../models/auth_models.dart';
@@ -34,7 +34,6 @@ class AuthRepositoryImpl implements AuthRepository {
       final request = LoginRequest(email: email, password: password);
       final response = await remoteDataSource.login(request);
 
-      // Save token and user locally
       await localDataSource.saveAuthToken(response.token);
       await localDataSource.saveUser(response.user);
 
@@ -97,7 +96,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> updateProfile({
     String? name,
     String? email,
-    String? avatar,
+    int? avatarId,
     String? phone,
   }) async {
     if (!await connectionChecker.hasConnection) {
@@ -107,12 +106,12 @@ class AuthRepositoryImpl implements AuthRepository {
       final request = UpdateProfileRequest(
         name: name,
         email: email,
-        avatar: avatar,
+        avatarId: avatarId,
         phone: phone,
       );
+
       final updatedUser = await remoteDataSource.updateProfile(request);
 
-      // Update local user data
       await localDataSource.saveUser(updatedUser);
 
       return Right(_mapUserModelToUser(updatedUser));
@@ -121,13 +120,12 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // Mapper from UserModel → domain User
   User _mapUserModelToUser(UserModel model) {
     return User(
       id: model.id,
       name: model.name,
       email: model.email,
-      avatar: model.avatar,
+      avatarId: model.avatarId,
       phone: model.phone,
     );
   }
@@ -136,9 +134,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User?>> getCurrentUser() async {
     try {
       final userModel = await localDataSource.getUser();
-      if (userModel == null) {
-        return const Right(null);
-      }
+      if (userModel == null) return const Right(null);
       return Right(_mapUserModelToUser(userModel));
     } catch (e) {
       return Left(CacheFailure(e.toString()));
@@ -164,7 +160,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> deleteAccount() async {
     if (!await connectionChecker.hasConnection) {
-      // Fallback for dev/demo mode — clear local user
       await localDataSource.clearAuthData();
       return const Right(null);
     }
@@ -173,7 +168,6 @@ class AuthRepositoryImpl implements AuthRepository {
       await localDataSource.clearAuthData();
       return const Right(null);
     } catch (e) {
-      // In dev, clear local even if API fails
       await localDataSource.clearAuthData();
       return Left(ServerFailure('Failed to delete account: $e'));
     }

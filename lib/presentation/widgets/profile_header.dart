@@ -11,6 +11,7 @@ import '../widgets/loading_button.dart';
 import '../../../ui/core/themes/app_colors.dart';
 import '../widgets/stat_tile.dart';
 import '../widgets/profile_nav_bar.dart';
+import '../../../ui/core/utils/avatar_mapper.dart';
 
 class ProfileHeader extends StatelessWidget {
   final int wishCount;
@@ -32,7 +33,8 @@ class ProfileHeader extends StatelessWidget {
       builder: (context, state) {
         User? user;
         if (state is AuthAuthenticated) user = state.user;
-        final avatar = user?.avatar ?? 'assets/images/avatar_placeholder.png';
+
+        final avatarAsset = AvatarMapper.getAvatarAsset(user?.avatarId);
         final name = user?.name ?? 'Guest';
 
         return Container(
@@ -50,7 +52,8 @@ class ProfileHeader extends StatelessWidget {
           ),
           child: Column(
             children: [
-              SizedBox(height: 30.h,),
+              SizedBox(height: 30.h),
+
               // Avatar + Stats row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,7 +64,7 @@ class ProfileHeader extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 50.r,
-                        backgroundImage: AssetImage(avatar),
+                        backgroundImage: AssetImage(avatarAsset),
                       ),
                       SizedBox(height: 8.h),
                       Text(
@@ -127,7 +130,7 @@ class ProfileHeader extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 6.w),
-                            Icon(Icons.exit_to_app, color: AppColors.white),
+                            const Icon(Icons.exit_to_app, color: AppColors.white),
                           ],
                         ),
                       ),

@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../ui/core/error/failures';
+import '../../ui/core/error/failures.dart';
 import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
+
 @injectable
 class LoginUseCase {
   final AuthRepository repository;
@@ -17,6 +18,7 @@ class LoginUseCase {
     return await repository.login(email: email, password: password);
   }
 }
+
 @injectable
 class RegisterUseCase {
   final AuthRepository repository;
@@ -27,10 +29,10 @@ class RegisterUseCase {
     required String name,
     required String email,
     required String password,
-    required String confirmPassword, // ✅ backend requires this
+    required String confirmPassword,
     required String lang,
-    required int avatarId,           // ✅ backend requires number
-    required String phone,           // ✅ backend requires valid phone
+    required int avatarId,
+    required String phone,
   }) async {
     return await repository.register(
       name: name,
@@ -43,6 +45,7 @@ class RegisterUseCase {
     );
   }
 }
+
 @injectable
 class ForgotPasswordUseCase {
   final AuthRepository repository;
@@ -65,13 +68,13 @@ class UpdateProfileUseCase {
   Future<Either<Failure, User>> call({
     String? name,
     String? email,
-    String? avatar,
+    int? avatarId,
     String? phone,
   }) async {
     return await repository.updateProfile(
       name: name,
       email: email,
-      avatar: avatar,
+      avatarId: avatarId,
       phone: phone,
     );
   }
@@ -112,10 +115,11 @@ class IsLoggedInUseCase {
 
 @injectable
 class DeleteAccountUseCase {
-    final AuthRepository repository;
-    DeleteAccountUseCase(this.repository);
+  final AuthRepository repository;
 
-    Future<Either<Failure, void>> call() async{
-      return await repository.deleteAccount();
-    }
+  DeleteAccountUseCase(this.repository);
+
+  Future<Either<Failure, void>> call() async {
+    return await repository.deleteAccount();
   }
+}

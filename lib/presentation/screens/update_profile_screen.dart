@@ -9,6 +9,7 @@ import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/avatar_grid.dart';
 import '../widgets/loading_button.dart';
+import '../../../ui/core/utils/avatar_mapper.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({Key? key}) : super(key: key);
@@ -20,17 +21,18 @@ class UpdateProfileScreen extends StatefulWidget {
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  String? _selectedAvatar;
+  int? _selectedAvatarId;
 
   @override
   void initState() {
     super.initState();
     final state = context.read<AuthCubit>().state;
     if (state is AuthAuthenticated) {
-      // Pre-fill with registered values
       _nameController.text = state.user.name;
-      _phoneController.text = state.user.phone ?? ""; // make sure phone exists in your model
-      _selectedAvatar = state.user.avatar; // path or URL of avatar chosen at registration
+      _phoneController.text = state.user.phone ?? "";
+      _selectedAvatarId = state.user.avatarId ?? 1;
+    } else {
+      _selectedAvatarId = 1;
     }
   }
 
@@ -46,8 +48,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         ),
         padding: EdgeInsets.all(16.w),
         child: AvatarGrid(
-          onAvatarSelected: (path) {
-            setState(() => _selectedAvatar = path);
+          onAvatarSelected: (id) {
+            setState(() => _selectedAvatarId = id);
             Navigator.of(context).pop();
           },
         ),
@@ -58,13 +60,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void _onUpdate() {
     context.read<AuthCubit>().updateProfile(
       name: _nameController.text.trim(),
-      phone: _phoneController.text.trim(), // make sure updateProfile supports phone
-      avatar: _selectedAvatar,
+      phone: _phoneController.text.trim(),
+      avatarId: _selectedAvatarId ?? 1,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final avatarAsset = AvatarMapper.getAvatarAsset(_selectedAvatarId);
+
     return Scaffold(
       backgroundColor: AppColors.primaryBlack,
       body: SafeArea(
@@ -73,7 +77,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              /// Header
               Row(
                 children: [
                   IconButton(
@@ -97,7 +101,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               ),
               SizedBox(height: 16.h),
 
-              // Avatar picker
+              /// Avatar picker
               Center(
                 child: GestureDetector(
                   onTap: _openAvatarPicker,
@@ -105,11 +109,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     children: [
                       CircleAvatar(
                         radius: 60.r,
-                        backgroundImage: _selectedAvatar != null
-                            ? (_selectedAvatar!.startsWith("http")
-                            ? NetworkImage(_selectedAvatar!)
-                            : AssetImage(_selectedAvatar!) as ImageProvider)
-                            : const AssetImage('assets/images/avatar_placeholder.png'),
+                        backgroundImage: AssetImage(avatarAsset),
                       ),
                       SizedBox(height: 8.h),
                     ],
@@ -118,7 +118,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               ),
               SizedBox(height: 18.h),
 
-              // Name field
+              /// Name field
               TextField(
                 controller: _nameController,
                 style: const TextStyle(color: Colors.white),
@@ -135,7 +135,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               ),
               SizedBox(height: 12.h),
 
-              // Phone field
+              /// Phone field
               TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
@@ -153,7 +153,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               ),
               SizedBox(height: 18.h),
 
-              // Reset password link
+              /// Reset password link
               TextButton(
                 onPressed: () => context.push('/forgot-password'),
                 child: Text(
@@ -168,7 +168,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
               const Spacer(),
 
-              // Update & delete buttons
+              /// Update & delete buttons
               BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) {
                   if (state is AuthAuthenticated) {

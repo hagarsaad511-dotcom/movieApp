@@ -4,7 +4,7 @@ class User extends Equatable {
   final int id;
   final String name;
   final String email;
-  final String? avatar;
+  final int? avatarId;
   final String? phone;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -13,7 +13,7 @@ class User extends Equatable {
     required this.id,
     required this.name,
     required this.email,
-    this.avatar,
+    this.avatarId,
     this.phone,
     this.createdAt,
     this.updatedAt,
@@ -23,7 +23,7 @@ class User extends Equatable {
     int? id,
     String? name,
     String? email,
-    String? avatar,
+    int? avatarId,
     String? phone,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -32,7 +32,7 @@ class User extends Equatable {
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
-      avatar: avatar ?? this.avatar,
+      avatarId: avatarId ?? this.avatarId,
       phone: phone ?? this.phone,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -40,5 +40,5 @@ class User extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, email, avatar, phone, createdAt, updatedAt];
+  List<Object?> get props => [id, name, email, avatarId, phone, createdAt, updatedAt];
 }

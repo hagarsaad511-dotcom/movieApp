@@ -11,29 +11,27 @@ class UserModel extends Equatable {
   final int id;
   final String name;
   final String email;
-  final String? avatar;
+
+  @JsonKey(name: 'avaterId')
+  final int? avatarId;
+
   final String? phone;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
-    this.avatar,
+    this.avatarId,
     this.phone,
   });
 
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: json['id'],
-    name: json['name'],
-    email: json['email'],
-    avatar: json['avatar'],
-    phone: json['phone'],
-  );
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   @override
-  List<Object?> get props => [id, name, email, avatar];
+  List<Object?> get props => [id, name, email, avatarId, phone];
 }
 
 /// --------------------
@@ -94,7 +92,7 @@ class RegisterRequest extends Equatable {
 
   final String lang;
 
-  @JsonKey(name: 'avatarId')
+  @JsonKey(name: 'avaterId')
   final int avatarId;
 
   final String phone;
@@ -162,11 +160,18 @@ class ForgotPasswordRequest {
 class UpdateProfileRequest extends Equatable {
   final String? name;
   final String? email;
-  final String? avatar;
+
+  @JsonKey(name: 'avaterId')
+  final int? avatarId;
+
   final String? phone;
 
-  UpdateProfileRequest({this.name, this.email, this.avatar, this.phone});
-
+  const UpdateProfileRequest({
+    this.name,
+    this.email,
+    this.avatarId,
+    this.phone,
+  });
 
   factory UpdateProfileRequest.fromJson(Map<String, dynamic> json) =>
       _$UpdateProfileRequestFromJson(json);
@@ -174,9 +179,10 @@ class UpdateProfileRequest extends Equatable {
   Map<String, dynamic> toJson() => {
     if (name != null) 'name': name,
     if (email != null) 'email': email,
-    if (avatar != null) 'avatar': avatar,
-    if (phone != null) 'phone': phone, // ✅
+    if (avatarId != null) 'avaterId': avatarId,
+    if (phone != null) 'phone': phone,
   };
+
   @override
-  List<Object?> get props => [name, email, avatar];
+  List<Object?> get props => [name, email, avatarId, phone];
 }

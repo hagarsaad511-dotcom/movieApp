@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 
-import '../../ui/core/error/failures';
+import '../../ui/core/error/failures.dart';
 import '../entities/user.dart';
 
 abstract class AuthRepository {
@@ -19,17 +19,16 @@ abstract class AuthRepository {
     required String phone,
   });
 
-
-  Future<Either<Failure, void>> forgotPassword({required String email}); // Make this abstract
-
+  Future<Either<Failure, void>> forgotPassword({
+    required String email,
+  });
 
   Future<Either<Failure, User>> updateProfile({
     String? name,
     String? email,
-    String? avatar,
+    int? avatarId,
     String? phone,
   });
-
 
   Future<Either<Failure, User?>> getCurrentUser();
 

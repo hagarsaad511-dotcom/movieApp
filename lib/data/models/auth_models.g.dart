@@ -10,7 +10,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       email: json['email'] as String,
-      avatar: json['avatar'] as String?,
+      avatarId: (json['avaterId'] as num?)?.toInt(),
       phone: json['phone'] as String?,
     );
 
@@ -18,7 +18,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'email': instance.email,
-      'avatar': instance.avatar,
+      'avaterId': instance.avatarId,
       'phone': instance.phone,
     };
 
@@ -52,7 +52,7 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
       password: json['password'] as String,
       confirmPassword: json['confirmPassword'] as String,
       lang: json['lang'] as String,
-      avatarId: (json['avatarId'] as num).toInt(),
+      avatarId: (json['avaterId'] as num).toInt(),
       phone: json['phone'] as String,
     );
 
@@ -63,7 +63,7 @@ Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
       'password': instance.password,
       'confirmPassword': instance.confirmPassword,
       'lang': instance.lang,
-      'avatarId': instance.avatarId,
+      'avaterId': instance.avatarId,
       'phone': instance.phone,
     };
 
@@ -96,7 +96,7 @@ UpdateProfileRequest _$UpdateProfileRequestFromJson(
     UpdateProfileRequest(
       name: json['name'] as String?,
       email: json['email'] as String?,
-      avatar: json['avatar'] as String?,
+      avatarId: (json['avaterId'] as num?)?.toInt(),
       phone: json['phone'] as String?,
     );
 
@@ -105,6 +105,6 @@ Map<String, dynamic> _$UpdateProfileRequestToJson(
     <String, dynamic>{
       'name': instance.name,
       'email': instance.email,
-      'avatar': instance.avatar,
+      'avaterId': instance.avatarId,
       'phone': instance.phone,
     };

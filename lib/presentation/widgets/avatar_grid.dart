@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../ui/core/themes/app_colors.dart';
+import '../../../ui/core/utils/avatar_mapper.dart';
 
 class AvatarGrid extends StatefulWidget {
-  final void Function(String) onAvatarSelected;
+  /// Callback now returns avatarId (1-based index)
+  final void Function(int avatarId) onAvatarSelected;
 
   const AvatarGrid({Key? key, required this.onAvatarSelected}) : super(key: key);
 
@@ -14,20 +16,11 @@ class AvatarGrid extends StatefulWidget {
 class _AvatarGridState extends State<AvatarGrid> {
   int? _selectedIndex;
 
-  final List<String> avatars = const [
-    "assets/images/avatar1.png",
-    "assets/images/avatar2.png",
-    "assets/images/avatar3.png",
-    "assets/images/avatar 4.png",
-    "assets/images/avatar 5.png",
-    "assets/images/avatar 6.png",
-    "assets/images/avatar 7.png",
-    "assets/images/avatar 8.png",
-    "assets/images/avatar 9.png",
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final avatars = AvatarMapper.all;
+
+
     return GridView.builder(
       itemCount: avatars.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -43,13 +36,18 @@ class _AvatarGridState extends State<AvatarGrid> {
         return GestureDetector(
           onTap: () {
             setState(() => _selectedIndex = index);
-            widget.onAvatarSelected(path);
+            widget.onAvatarSelected(index + 1); // 1-based id
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.yellow : AppColors.mediumGrey,
+              color: isSelected
+                  ? AppColors.yellow.withOpacity(0.2)
+                  : AppColors.mediumGrey,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppColors.yellow, width: 2),
+              border: Border.all(
+                color: isSelected ? AppColors.yellow : Colors.transparent,
+                width: 2,
+              ),
             ),
             padding: EdgeInsets.all(8.w),
             child: Center(
