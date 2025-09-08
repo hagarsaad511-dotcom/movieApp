@@ -14,7 +14,7 @@ class _ApiService implements ApiService {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'https://your-auth-api.com/api';
+    baseUrl ??= 'https://route-movie-apis.vercel.app/';
   }
 
   final Dio _dio;

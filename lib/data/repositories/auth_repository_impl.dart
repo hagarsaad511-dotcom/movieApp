@@ -49,10 +49,10 @@ class AuthRepositoryImpl implements AuthRepository {
     required String name,
     required String email,
     required String password,
-    required String passwordConfirmation,
+    required String confirmPassword,
     required String lang,
-    String? avatar,
-    String? phone,
+    required int avatarId,
+    required String phone,
   }) async {
     if (!await connectionChecker.hasConnection) {
       return Left(NetworkFailure('No internet connection'));
@@ -62,15 +62,14 @@ class AuthRepositoryImpl implements AuthRepository {
         name: name,
         email: email,
         password: password,
-        passwordConfirmation: passwordConfirmation,
+        confirmPassword: confirmPassword,
         lang: lang,
-        avatar: avatar,
+        avatarId: avatarId,
         phone: phone,
       );
 
       final response = await remoteDataSource.register(request);
 
-      // Persist auth token & user locally
       await localDataSource.saveAuthToken(response.token);
       await localDataSource.saveUser(response.user);
 

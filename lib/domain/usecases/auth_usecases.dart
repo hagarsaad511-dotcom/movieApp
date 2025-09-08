@@ -27,18 +27,18 @@ class RegisterUseCase {
     required String name,
     required String email,
     required String password,
-    required String passwordConfirmation,
+    required String confirmPassword, // ✅ backend requires this
     required String lang,
-    String? avatar,
-    String? phone,
+    required int avatarId,           // ✅ backend requires number
+    required String phone,           // ✅ backend requires valid phone
   }) async {
     return await repository.register(
       name: name,
       email: email,
       password: password,
-      passwordConfirmation: passwordConfirmation,
+      confirmPassword: confirmPassword,
       lang: lang,
-      avatar: avatar,
+      avatarId: avatarId,
       phone: phone,
     );
   }

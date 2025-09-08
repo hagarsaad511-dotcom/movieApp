@@ -88,20 +88,25 @@ class RegisterRequest extends Equatable {
   final String name;
   final String email;
   final String password;
-  @JsonKey(name: 'password_confirmation')
-  final String passwordConfirmation;
+
+  @JsonKey(name: 'confirmPassword')
+  final String confirmPassword;
+
   final String lang;
-  final String? avatar;
-  final String? phone;
+
+  @JsonKey(name: 'avatarId')
+  final int avatarId;
+
+  final String phone;
 
   const RegisterRequest({
     required this.name,
     required this.email,
     required this.password,
-    required this.passwordConfirmation,
+    required this.confirmPassword,
     required this.lang,
-    this.avatar,
-    this.phone
+    required this.avatarId,
+    required this.phone,
   });
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) =>
@@ -111,7 +116,7 @@ class RegisterRequest extends Equatable {
 
   @override
   List<Object?> get props =>
-      [name, email, password, passwordConfirmation, lang, avatar];
+      [name, email, password, confirmPassword, lang, avatarId, phone];
 }
 
 /// --------------------

@@ -50,10 +50,10 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       email: json['email'] as String,
       password: json['password'] as String,
-      passwordConfirmation: json['password_confirmation'] as String,
+      confirmPassword: json['confirmPassword'] as String,
       lang: json['lang'] as String,
-      avatar: json['avatar'] as String?,
-      phone: json['phone'] as String?,
+      avatarId: (json['avatarId'] as num).toInt(),
+      phone: json['phone'] as String,
     );
 
 Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
@@ -61,9 +61,9 @@ Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
       'name': instance.name,
       'email': instance.email,
       'password': instance.password,
-      'password_confirmation': instance.passwordConfirmation,
+      'confirmPassword': instance.confirmPassword,
       'lang': instance.lang,
-      'avatar': instance.avatar,
+      'avatarId': instance.avatarId,
       'phone': instance.phone,
     };
 

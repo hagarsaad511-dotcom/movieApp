@@ -11,6 +11,7 @@ import '../../../data/datasources/auth_remote_datasource.dart';
 import '../../../data/datasources/local_datasource.dart';
 import '../../../presentation/cubits/auth/auth_cubit.dart';
 import '../../../ui/core/network/api_service.dart';
+import '../network/dio_client.dart';
 
 final sl = GetIt.instance;
 
@@ -26,7 +27,7 @@ Future<void> init() async {
   sl.registerLazySingleton<Dio>(() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: "https://your-api-base-url.com", // TODO: replace with real base URL
+        baseUrl: "https://route-movie-apis.vercel.app/", // TODO: replace with real base URL
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {

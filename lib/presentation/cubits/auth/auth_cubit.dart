@@ -25,18 +25,19 @@ class AuthCubit extends Cubit<AuthState> {
       this._deleteAccountUseCase,
       ) : super(AuthInitial());
 
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
     emit(AuthLoading());
-    final result = await _loginUseCase.call(
-      email: email,
-      password: password,
-    );
+    final result = await _loginUseCase.call(email: email, password: password);
+
     result.fold(
-          (failure) => emit(AuthError(failure.message)),
-          (user) => emit(AuthAuthenticated(user)),
+          (failure) {
+        print("❌ Login failed: ${failure.message}");
+        emit(AuthError(failure.message));
+      },
+          (user) {
+        print("✅ Login success: ${user.email}, ID: ${user.id}");
+        emit(AuthAuthenticated(user));
+      },
     );
   }
 
@@ -44,19 +45,19 @@ class AuthCubit extends Cubit<AuthState> {
     required String name,
     required String email,
     required String password,
-    required String passwordConfirmation,
+    required String confirmPassword,
     required String lang,
-    String? avatar,
-    String? phone,
+    required int avatarId,
+    required String phone,
   }) async {
     emit(AuthLoading());
     final result = await _registerUseCase.call(
       name: name,
       email: email,
       password: password,
-      passwordConfirmation: passwordConfirmation,
+      confirmPassword: confirmPassword,
       lang: lang,
-      avatar: avatar,
+      avatarId: avatarId,
       phone: phone,
     );
     result.fold(
@@ -64,6 +65,7 @@ class AuthCubit extends Cubit<AuthState> {
           (user) => emit(AuthAuthenticated(user)),
     );
   }
+
 
   Future<void> forgotPassword({required String email}) async {
     emit(AuthLoading());

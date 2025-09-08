@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
     print("hasSeenOnboarding = $hasSeenOnboarding");
 
     if (hasSeenOnboarding) {
-      context.go('/profile');
+      context.go('/login');
     } else {
       //context.go('/onboarding');
     }

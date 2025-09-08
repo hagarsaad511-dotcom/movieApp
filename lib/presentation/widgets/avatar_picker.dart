@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AvatarPicker extends StatefulWidget {
-  final Function(String) onAvatarSelected;
-
+  final Function(int) onAvatarSelected;
   const AvatarPicker({super.key, required this.onAvatarSelected});
 
   @override
@@ -10,24 +9,27 @@ class AvatarPicker extends StatefulWidget {
 }
 
 class _AvatarPickerState extends State<AvatarPicker> {
-  String? _selectedAvatar;
+  int _selectedAvatarIndex = 0;
 
   final PageController _pageController = PageController(viewportFraction: 0.35);
-
 
   final List<String> _defaultAvatars = [
     "assets/images/avatar1.png",
     "assets/images/avatar2.png",
     "assets/images/avatar3.png",
-    
+    "assets/images/avatar 4.png",
+    "assets/images/avatar 5.png",
+    "assets/images/avatar 6.png",
+    "assets/images/avatar 7.png",
+    "assets/images/avatar 8.png",
+    "assets/images/avatar 9.png",
   ];
 
   @override
   void initState() {
     super.initState();
-    _selectedAvatar = _defaultAvatars[0];
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.onAvatarSelected(_selectedAvatar!);
+      widget.onAvatarSelected(_selectedAvatarIndex + 1);
     });
   }
 
@@ -40,9 +42,9 @@ class _AvatarPickerState extends State<AvatarPicker> {
         itemCount: _defaultAvatars.length,
         onPageChanged: (index) {
           setState(() {
-            _selectedAvatar = _defaultAvatars[index];
+            _selectedAvatarIndex = index;
           });
-          widget.onAvatarSelected(_defaultAvatars[index]);
+          widget.onAvatarSelected(index + 1);
         },
         itemBuilder: (context, index) {
           return AnimatedBuilder(

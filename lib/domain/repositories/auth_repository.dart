@@ -13,11 +13,12 @@ abstract class AuthRepository {
     required String name,
     required String email,
     required String password,
-    required String passwordConfirmation,
+    required String confirmPassword,
     required String lang,
-    String? avatar,
-    String?phone,
+    required int avatarId,
+    required String phone,
   });
+
 
   Future<Either<Failure, void>> forgotPassword({required String email}); // Make this abstract
 

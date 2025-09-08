@@ -32,18 +32,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  String? _selectedAvatarPath;
+  int _selectedAvatarId = 1;
 
   void _onSubmit() {
     final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+
     if (_formKey.currentState!.validate()) {
       context.read<AuthCubit>().register(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-        passwordConfirmation: _confirmPasswordController.text.trim(),
+        confirmPassword: _confirmPasswordController.text.trim(),
         lang: langProvider.currentLangCode.trim(),
-        avatar: _selectedAvatarPath?.trim(),
+        avatarId: _selectedAvatarId,
         phone: _phoneController.text.trim(),
       );
     }
@@ -55,6 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -101,9 +103,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Column(
                       children: [
                         AvatarPicker(
-                          onAvatarSelected: (avatarPath) {
+                          onAvatarSelected: (avatarId) {
                             setState(() {
-                              _selectedAvatarPath = avatarPath;
+                              _selectedAvatarId = avatarId;
                             });
                           },
                         ),
@@ -138,13 +140,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
                       if (val == null || val.isEmpty) return lang.enterEmailError;
-                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
+                      if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                          .hasMatch(val)) {
                         return lang.invalidEmailError;
                       }
                       return null;
                     },
                   ),
                   SizedBox(height: 16.h),
+
 
                   /// Password
                   CustomTextField(
@@ -165,7 +169,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     validator: (val) {
                       if (val == null || val.isEmpty) return lang.enterPasswordError;
-                      if (val.length < 6) return lang.passwordLengthError;
+                      if (val.length < 8) return lang.passwordLengthError;
+
+                       final regex =
+                      RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+                      if (!regex.hasMatch(val)) {
+                        return "Password must include uppercase, lowercase, number, and special character";
+                      }
+
                       return null;
                     },
                   ),
@@ -202,9 +213,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hintText: lang.phoneNumber,
                     icon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
-                    validator: (val) =>
-                    val == null || val.isEmpty ? lang.enterPhoneError : null,
+                    validator: (val) {
+                      if (val == null || val.isEmpty) return lang.enterPhoneError;
+                      if (!RegExp(r'^[0-9]{11}$').hasMatch(val)) {
+                        return "Phone number must be exactly 11 digits";
+                      }
+                      return null;
+                    },
                   ),
+
                   SizedBox(height: 24.h),
 
                   /// Register Button
@@ -246,7 +263,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   /// Language Switcher
                   Builder(
                     builder: (context) {
-                      final langProvider = Provider.of<LanguageProvider>(context);
+                      final langProvider =
+                      Provider.of<LanguageProvider>(context);
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

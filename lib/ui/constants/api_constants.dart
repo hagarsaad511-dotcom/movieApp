@@ -1,15 +1,15 @@
 class ApiConstants {
-  static const String baseUrl = 'https://yts.mx/api';
-  static const String authBaseUrl = 'https://your-auth-api.com/api'; // replace with real auth API
 
   // Movie endpoints
-  static const String listMovies = '/v2/list_movies.json';
-  static const String movieDetails = '/v2/movie_details.json';
-  static const String movieSuggestions = '/v2/movie_suggestions.json';
-
+  static const String moviesBaseUrl = 'https://yts.mx/api';
+  static const String listMovies = '/list_movies.json';
+  static const String movieDetails = '/movie_details.json';
+  static const String movieSuggestions = '/movie_suggestions.json';
   // Auth endpoints
+  static const String authBaseUrl = 'https://route-movie-apis.vercel.app/';
   static const String login = '/auth/login';
   static const String register = '/auth/register';
   static const String resetPassword = '/auth/reset-password';
   static const String profile = '/auth/profile';
+  static const String delete = '/auth/delete';
 }
