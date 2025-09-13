@@ -14,7 +14,6 @@ import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/lang_button.dart';
 import '../widgets/loading_button.dart';
-import '../widgets/avatar_grid.dart';
 import 'language_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -36,6 +35,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscureConfirmPassword = true;
   int _selectedAvatarId = 1;
 
+  // Normalizes phone to E.164 format (Egypt default +20)
+  String _normalizePhone(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.startsWith("0")) {
+      return "+2${trimmed.substring(1)}"; // convert 010... -> +2010...
+    }
+    return trimmed;
+  }
+
   void _onSubmit() {
     final langProvider = Provider.of<LanguageProvider>(context, listen: false);
 
@@ -46,8 +54,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text.trim(),
         confirmPassword: _confirmPasswordController.text.trim(),
         lang: langProvider.currentLangCode.trim(),
-        avatarId: _selectedAvatarId,
-        phone: _phoneController.text.trim(),
+        avatarId: _selectedAvatarId, // ✅ backend expects "avaterId"
+        phone: _normalizePhone(_phoneController.text),
       );
     }
   }
@@ -71,216 +79,226 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(20.w),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  /// Top Row (Back Arrow + Register)
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: AppColors.yellow),
-                        onPressed: () => context.pop(),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            lang.register,
-                            style: GoogleFonts.roboto(
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.yellow,
+          child: BlocListener<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is AuthSuccess) {
+                // ✅ Navigate to login after successful registration
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                context.go('/login'); // replace current stack with login
+              }
+            },
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    /// Top Row (Back Arrow + Register)
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back,
+                              color: AppColors.yellow),
+                          onPressed: () => context.pop(),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              lang.register,
+                              style: GoogleFonts.roboto(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.yellow,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 48),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
+                        const SizedBox(width: 48),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
 
-                  /// Avatar Picker (Grid of avatars → emits int avatarId)
-                  Center(
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 220.h,
-                          child: AvatarPicker(
-                            onAvatarSelected: (avatarId) {
-                              setState(() {
-                                _selectedAvatarId = avatarId;
-                              });
-                            },
+                    /// Avatar Picker
+                    Center(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 220.h,
+                            child: AvatarPicker(
+                              onAvatarSelected: (avatarId) {
+                                setState(() => _selectedAvatarId = avatarId);
+                              },
+                            ),
                           ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            lang.avatar,
+                            style: GoogleFonts.roboto(
+                              fontSize: 16.sp,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+
+                    /// Name
+                    CustomTextField(
+                      controller: _nameController,
+                      hintText: lang.name,
+                      icon: Icons.person_outline,
+                      validator: (val) => val == null || val.isEmpty
+                          ? lang.enterNameError
+                          : null,
+                    ),
+                    SizedBox(height: 16.h),
+
+                    /// Email
+                    CustomTextField(
+                      controller: _emailController,
+                      hintText: lang.email,
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (val) => Validators.validateEmail(
+                        val,
+                        emptyMsg: lang.enterEmailError,
+                        invalidMsg: lang.invalidEmailError,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+
+                    /// Password
+                    CustomTextField(
+                      controller: _passwordController,
+                      hintText: lang.passwordHint,
+                      icon: Icons.lock_outline,
+                      obscureText: _obscurePassword,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.white,
                         ),
-                        SizedBox(height: 8.h),
+                        onPressed: () {
+                          setState(() => _obscurePassword = !_obscurePassword);
+                        },
+                      ),
+                      validator: (val) => Validators.validatePassword(
+                        val,
+                        emptyMsg: lang.enterPasswordError,
+                        lengthMsg: lang.passwordLengthError,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+
+                    /// Confirm Password
+                    CustomTextField(
+                      controller: _confirmPasswordController,
+                      hintText: lang.confirmPassword,
+                      icon: Icons.lock_outline,
+                      obscureText: _obscureConfirmPassword,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() => _obscureConfirmPassword =
+                          !_obscureConfirmPassword);
+                        },
+                      ),
+                      validator: (val) => Validators.validateConfirmPassword(
+                        val,
+                        _passwordController.text,
+                        mismatchMsg: lang.passwordsNotMatch,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+
+                    /// Phone
+                    CustomTextField(
+                      controller: _phoneController,
+                      hintText: lang.phoneNumber,
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      validator: (val) => Validators.validatePhone(
+                        val,
+                        emptyMsg: lang.enterPhoneError,
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+
+                    /// Register Button
+                    BlocBuilder<AuthCubit, AuthState>(
+                      builder: (context, state) {
+                        return LoadingButton(
+                          text: lang.createAccount,
+                          isLoading: state is AuthLoading,
+                          onPressed: _onSubmit,
+                          backgroundColor: AppColors.yellow,
+                          textColor: AppColors.primaryBlack,
+                        );
+                      },
+                    ),
+                    SizedBox(height: 20.h),
+
+                    /// Already Have Account
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                         Text(
-                          lang.avatar,
-                          style: GoogleFonts.roboto(
-                            fontSize: 16.sp,
-                            color: AppColors.white,
+                          "${lang.alreadyHaveAccount} ",
+                          style: GoogleFonts.roboto(color: AppColors.white),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.push('/login'),
+                          child: Text(
+                            lang.login,
+                            style: GoogleFonts.roboto(
+                              color: AppColors.yellow,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(height: 24.h),
+                    SizedBox(height: 20.h),
 
-                  /// Name
-                  CustomTextField(
-                    controller: _nameController,
-                    hintText: lang.name,
-                    icon: Icons.person_outline,
-                    validator: (val) =>
-                    val == null || val.isEmpty ? lang.enterNameError : null,
-                  ),
-                  SizedBox(height: 16.h),
-
-                  /// Email
-                  CustomTextField(
-                    controller: _emailController,
-                    hintText: lang.email,
-                    icon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (val) => Validators.validateEmail(
-                      val,
-                      emptyMsg: lang.enterEmailError,
-                      invalidMsg: lang.invalidEmailError,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-
-                  /// Password
-                  CustomTextField(
-                    controller: _passwordController,
-                    hintText: lang.passwordHint,
-                    icon: Icons.lock_outline,
-                    obscureText: _obscurePassword,
-                    suffix: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
+                    /// Language Switcher
+                    Builder(
+                      builder: (context) {
+                        final langProvider =
+                        Provider.of<LanguageProvider>(context);
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            LangButton(
+                              langCode: "en",
+                              asset: "assets/icons/LR.png",
+                              isSelected: langProvider.currentLangCode == "en",
+                              onPressed: () => langProvider.setLang("en"),
+                            ),
+                            SizedBox(width: 10.w),
+                            LangButton(
+                              langCode: "ar",
+                              asset: "assets/icons/EG.png",
+                              isSelected: langProvider.currentLangCode == "ar",
+                              onPressed: () => langProvider.setLang("ar"),
+                            ),
+                          ],
+                        );
                       },
                     ),
-                    validator: (val) => Validators.validatePassword(
-                      val,
-                      emptyMsg: lang.enterPasswordError,
-                      lengthMsg: lang.passwordLengthError,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-
-                  /// Confirm Password
-                  CustomTextField(
-                    controller: _confirmPasswordController,
-                    hintText: lang.confirmPassword,
-                    icon: Icons.lock_outline,
-                    obscureText: _obscureConfirmPassword,
-                    suffix: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
-                    ),
-                    validator: (val) => Validators.validateConfirmPassword(
-                      val,
-                      _passwordController.text,
-                      mismatchMsg: lang.passwordsNotMatch,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-
-                  /// Phone
-                  CustomTextField(
-                    controller: _phoneController,
-                    hintText: lang.phoneNumber,
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
-                    validator: (val) => Validators.validatePhone(
-                      val,
-                      emptyMsg: lang.enterPhoneError,
-                    ),
-                  ),
-
-                  SizedBox(height: 24.h),
-
-                  /// Register Button
-                  BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, state) {
-                      return LoadingButton(
-                        text: lang.createAccount,
-                        isLoading: state is AuthLoading,
-                        onPressed: _onSubmit,
-                        backgroundColor: AppColors.yellow,
-                        textColor: AppColors.primaryBlack,
-                      );
-                    },
-                  ),
-                  SizedBox(height: 20.h),
-
-                  /// Already Have Account
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "${lang.alreadyHaveAccount} ",
-                        style: GoogleFonts.roboto(color: AppColors.white),
-                      ),
-                      GestureDetector(
-                        onTap: () => context.push('/login'),
-                        child: Text(
-                          lang.login,
-                          style: GoogleFonts.roboto(
-                            color: AppColors.yellow,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-
-                  /// Language Switcher
-                  Builder(
-                    builder: (context) {
-                      final langProvider =
-                      Provider.of<LanguageProvider>(context);
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          LangButton(
-                            langCode: "en",
-                            asset: "assets/icons/LR.png",
-                            isSelected: langProvider.currentLangCode == "en",
-                            onPressed: () => langProvider.setLang("en"),
-                          ),
-                          SizedBox(width: 10.w),
-                          LangButton(
-                            langCode: "ar",
-                            asset: "assets/icons/EG.png",
-                            isSelected: langProvider.currentLangCode == "ar",
-                            onPressed: () => langProvider.setLang("ar"),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

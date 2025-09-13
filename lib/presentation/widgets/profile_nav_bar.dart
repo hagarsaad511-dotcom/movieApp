@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../ui/core/themes/app_colors.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 class ProfileNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -16,6 +17,8 @@ class ProfileNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context)!;
+
     return Container(
       margin: EdgeInsets.only(top: 12.h),
       padding: EdgeInsets.symmetric(vertical: 8.h),
@@ -26,8 +29,8 @@ class ProfileNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _navItem("Watch List", Icons.list, 0),
-          _navItem("History", Icons.folder, 1),
+          _navItem(lang.wishList, Icons.list, 0),
+          _navItem(lang.history, Icons.folder, 1),
         ],
       ),
     );

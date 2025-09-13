@@ -4,14 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../domain/entities/user.dart';
+import '../../../ui/core/themes/app_colors.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/loading_button.dart';
-import '../../../ui/core/themes/app_colors.dart';
-import '../widgets/stat_tile.dart';
-import '../widgets/profile_nav_bar.dart';
 import '../../../ui/core/utils/avatar_mapper.dart';
+import 'stat_tile.dart';
+import 'profile_nav_bar.dart';
 
 class ProfileHeader extends StatelessWidget {
   final int wishCount;
@@ -29,10 +29,12 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context)!;
+
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
-        User? user;
-        if (state is AuthAuthenticated) user = state.user;
+        final user =
+        state is AuthAuthenticated ? state.user : null;
 
         final avatarAsset = AvatarMapper.getAvatarAsset(user?.avatarId);
         final name = user?.name ?? 'Guest';
@@ -81,9 +83,9 @@ class ProfileHeader extends StatelessWidget {
                   // Wish List + History
                   Row(
                     children: [
-                      StatTile(title: 'Wish List', count: wishCount),
+                      StatTile(title: lang.wishList, count: wishCount),
                       SizedBox(width: 40.w),
-                      StatTile(title: 'History', count: historyCount),
+                      StatTile(title: lang.history, count: historyCount),
                     ],
                   ),
                 ],
@@ -99,7 +101,7 @@ class ProfileHeader extends StatelessWidget {
                     child: SizedBox(
                       height: 56.h,
                       child: LoadingButton(
-                        text: 'Edit Profile',
+                        text: lang.editProfile,
                         onPressed: () => context.push('/profile/update'),
                         backgroundColor: AppColors.yellow,
                         textColor: Colors.black,
@@ -123,14 +125,15 @@ class ProfileHeader extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Exit',
+                              lang.exit,
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 color: AppColors.white,
                               ),
                             ),
                             SizedBox(width: 6.w),
-                            const Icon(Icons.exit_to_app, color: AppColors.white),
+                            const Icon(Icons.exit_to_app,
+                                color: AppColors.white),
                           ],
                         ),
                       ),

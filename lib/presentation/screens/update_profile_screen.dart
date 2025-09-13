@@ -10,6 +10,7 @@ import '../cubits/auth/auth_state.dart';
 import '../widgets/avatar_grid.dart';
 import '../widgets/loading_button.dart';
 import '../../../ui/core/utils/avatar_mapper.dart';
+import '../../../l10n/gen/app_localizations.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({Key? key}) : super(key: key);
@@ -68,6 +69,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final avatarAsset = AvatarMapper.getAvatarAsset(_selectedAvatarId);
+    final lang = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.primaryBlack,
@@ -87,7 +89,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   Expanded(
                     child: Center(
                       child: Text(
-                        'Update Profile',
+                        lang.editProfile,
                         style: GoogleFonts.roboto(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.normal,
@@ -112,6 +114,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         backgroundImage: AssetImage(avatarAsset),
                       ),
                       SizedBox(height: 8.h),
+                      Text(
+                        lang.tapToChangeAvatar,
+                        style: GoogleFonts.roboto(
+                          fontSize: 14.sp,
+                          color: AppColors.white,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -124,7 +133,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.person, color: Colors.white),
-                  hintText: 'Name',
+                  hintText: lang.name,
+                  hintStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: AppColors.darkGrey,
                   border: OutlineInputBorder(
@@ -142,7 +152,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.phone, color: Colors.white),
-                  hintText: 'Phone number',
+                  hintText: lang.phoneNumber,
+                  hintStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: AppColors.darkGrey,
                   border: OutlineInputBorder(
@@ -155,9 +166,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
               /// Reset password link
               TextButton(
-                onPressed: () => context.push('/forgot-password'),
+                onPressed: () => context.push('/reset-password'),
                 child: Text(
-                  "Reset Password",
+                  lang.resetPassword,
                   style: GoogleFonts.roboto(
                     color: AppColors.white,
                     fontSize: 14.sp,
@@ -174,7 +185,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   if (state is AuthAuthenticated) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text('Profile updated'),
+                        content: Text(lang.editProfile),
                         backgroundColor: AppColors.yellow,
                       ),
                     );
@@ -197,8 +208,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: const Text('Delete Account'),
-                              content: const Text(
+                              title: Text(lang.deleteAccount),
+                              content: Text(
                                   'Are you sure you want to delete your account?'),
                               actions: [
                                 TextButton(
@@ -210,9 +221,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                     Navigator.pop(context);
                                     context.read<AuthCubit>().deleteAccount();
                                   },
-                                  child: const Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
+                                  child: Text(
+                                    lang.deleteAccount,
+                                    style: const TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ],
@@ -226,9 +237,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
-                        child: const Text(
-                          'Delete Account',
-                          style: TextStyle(
+                        child: Text(
+                          lang.deleteAccount,
+                          style: const TextStyle(
                             color: AppColors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
@@ -237,7 +248,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       ),
                       SizedBox(height: 12.h),
                       LoadingButton(
-                        text: 'Update Data',
+                        text: lang.updateData,
                         isLoading: isLoading,
                         onPressed: _onUpdate,
                         backgroundColor: AppColors.yellow,
