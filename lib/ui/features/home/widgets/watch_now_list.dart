@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:movie_app/data/model/response/movies_list_response.dart';
 import 'package:movie_app/routing/app_routes.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
-import 'package:movie_app/ui/features/home/movies_details/ui/movie_card.dart';
 
-import '../../../../core/themes/app_styles.dart';
+
+import '../../../core/themes/app_styles.dart';
+import '../../browse/ui/browse_screen.dart';
+import 'movie_card.dart';
 
 // class WatchNowList extends StatelessWidget {
 //   const WatchNowList({super.key, required this.movies});
@@ -92,14 +94,15 @@ class _WatchNowListState extends State<WatchNowList> {
                 Spacer(),
                 InkWell(
                   onTap: (){
-                    ///todo: Navigate to browse Screen
+                    ///todo:navigation   to browse screen
+
 
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text('See More', style: AppStyles.yellow16regular,),
-                      Icon(Icons.arrow_forward_outlined, color: AppColors.yellowColor,)
+                      Icon(Icons.arrow_forward_outlined, color: AppColors.yellow,)
                     ],
                   ),
                 )

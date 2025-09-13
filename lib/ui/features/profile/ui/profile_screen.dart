@@ -11,7 +11,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Text('Profile' ,style: TextStyle(
-          color: AppColors.whiteColor
+          color: AppColors.white
       ),),
     );
   }

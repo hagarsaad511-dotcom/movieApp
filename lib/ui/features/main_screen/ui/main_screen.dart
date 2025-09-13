@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
             borderRadius: BorderRadius.circular(16),
             child: BottomNavigationBar(
 
-              backgroundColor: AppColors.greyColor,
+              backgroundColor: AppColors.mediumGrey,
               type: BottomNavigationBarType.fixed,
               items: [
                 buildBottomNavigationBarItem(

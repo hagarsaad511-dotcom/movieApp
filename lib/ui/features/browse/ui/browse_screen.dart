@@ -8,8 +8,9 @@ import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_styles.dart';
 
 class BrowseScreen extends StatefulWidget {
-  const BrowseScreen({super.key});
+  const BrowseScreen({super.key, });
   static String searchScreenRouteName = AppRoutes.searchScreenRoute;
+  // final  String? initialGenre;
 
   @override
   State<BrowseScreen> createState() => _BrowseScreenState();
@@ -27,7 +28,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(
-                  color: AppColors.greyColor,
+                  color: AppColors.mediumGrey,
                 ),
               );
             }
@@ -68,7 +69,9 @@ class _BrowseScreenState extends State<BrowseScreen> {
               );
             }
             ///todo: server =>success
-            return MoviesByCategoryScreen(categorizedMovies: categorizedMovies);
+            return MoviesByCategoryScreen(
+                categorizedMovies: categorizedMovies,
+              );
 
           },)
     );

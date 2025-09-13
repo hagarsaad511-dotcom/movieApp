@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/ui/core/themes/app_colors.dart';
 
 import '../../../../data/model/response/movies_list_response.dart';
-import '../../home/movies_details/ui/movie_card.dart';
+import '../../home/widgets/movie_card.dart';
 
 ///todo: function to categorize movies by category and return map { key 'category: value ' List<Movies>'}
 
@@ -23,8 +24,7 @@ Map<String, List<Movies>> categorizeMovies(List<Movies> movies) {
 
 class MoviesByCategoryScreen extends StatelessWidget {
   final Map<String, List<Movies>> categorizedMovies;
-
-  const MoviesByCategoryScreen({super.key, required this.categorizedMovies});
+  const MoviesByCategoryScreen({super.key, required this.categorizedMovies,});
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +32,22 @@ class MoviesByCategoryScreen extends StatelessWidget {
 
     return DefaultTabController(
       length: genres.length,
-      child: Scaffold(
+
+    child: Scaffold(
 
         body: SafeArea(
             child: Column(
               children: [
+
                 TabBar(
+                  labelColor: AppColors.primaryBlack,
+                  unselectedLabelColor: AppColors.yellow,
+                  indicator: BoxDecoration(
+                    color: AppColors.yellow,
+                    borderRadius: BorderRadius.circular(12),
+                    shape: BoxShape.rectangle,
+
+                  ),
                   tabAlignment: TabAlignment.start,
                   isScrollable: true,
                   tabs: genres.map((genre) => Tab(text: genre)).toList(),
