@@ -11,13 +11,11 @@ abstract class LocalDataSource {
   Future<UserModel?> getUser();
   Future<void> removeUser();
 
-  /// Clear all local auth-related data
   Future<void> clearAuthData();
 }
 
 class LocalDataSourceImpl implements LocalDataSource {
   final SharedPreferences sharedPreferences;
-
   LocalDataSourceImpl(this.sharedPreferences);
 
   static const String _authTokenKey = 'auth_token';
@@ -40,19 +38,14 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<void> saveUser(UserModel user) async {
-    // 🔑 Includes avatarId & phone inside JSON
-    final userJson = json.encode(user.toJson());
-    await sharedPreferences.setString(_userKey, userJson);
+    await sharedPreferences.setString(_userKey, json.encode(user.toJson()));
   }
 
   @override
   Future<UserModel?> getUser() async {
     final userJson = sharedPreferences.getString(_userKey);
-    if (userJson != null) {
-      final userMap = json.decode(userJson) as Map<String, dynamic>;
-      return UserModel.fromJson(userMap);
-    }
-    return null;
+    if (userJson == null) return null;
+    return UserModel.fromJson(json.decode(userJson));
   }
 
   @override
@@ -62,7 +55,7 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<void> clearAuthData() async {
-    await sharedPreferences.remove(_authTokenKey);
-    await sharedPreferences.remove(_userKey);
+    await removeAuthToken();
+    await removeUser();
   }
 }
