@@ -4,7 +4,7 @@ import '../../../ui/core/themes/app_colors.dart';
 import '../../../ui/core/utils/avatar_mapper.dart';
 
 class AvatarGrid extends StatefulWidget {
-  /// Callback now returns avatarId (1-based index)
+  /// Callback returns avatarId (1-based index)
   final void Function(int avatarId) onAvatarSelected;
 
   const AvatarGrid({Key? key, required this.onAvatarSelected}) : super(key: key);
@@ -18,11 +18,8 @@ class _AvatarGridState extends State<AvatarGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final avatars = AvatarMapper.all;
-
-
     return GridView.builder(
-      itemCount: avatars.length,
+      itemCount: AvatarMapper.count,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 12.h,
@@ -30,13 +27,14 @@ class _AvatarGridState extends State<AvatarGrid> {
         childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
-        final path = avatars[index];
+        final avatarId = index + 1; // 1-based
+        final path = AvatarMapper.getAvatarAsset(avatarId);
         final isSelected = _selectedIndex == index;
 
         return GestureDetector(
           onTap: () {
             setState(() => _selectedIndex = index);
-            widget.onAvatarSelected(index + 1); // 1-based id
+            widget.onAvatarSelected(avatarId);
           },
           child: Container(
             decoration: BoxDecoration(

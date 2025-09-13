@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../ui/core/utils/avatar_mapper.dart';
 
 class AvatarPicker extends StatefulWidget {
+  /// Callback returns avatarId (1-based index)
   final Function(int) onAvatarSelected;
+
   const AvatarPicker({super.key, required this.onAvatarSelected});
 
   @override
@@ -10,25 +13,13 @@ class AvatarPicker extends StatefulWidget {
 
 class _AvatarPickerState extends State<AvatarPicker> {
   int _selectedAvatarIndex = 0;
-
   final PageController _pageController = PageController(viewportFraction: 0.35);
-
-  final List<String> _defaultAvatars = [
-    "assets/images/avatar1.png",
-    "assets/images/avatar2.png",
-    "assets/images/avatar3.png",
-    "assets/images/avatar 4.png",
-    "assets/images/avatar 5.png",
-    "assets/images/avatar 6.png",
-    "assets/images/avatar 7.png",
-    "assets/images/avatar 8.png",
-    "assets/images/avatar 9.png",
-  ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initial callback (1-based ID)
       widget.onAvatarSelected(_selectedAvatarIndex + 1);
     });
   }
@@ -36,17 +27,18 @@ class _AvatarPickerState extends State<AvatarPicker> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 120,
+      height: 140,
       child: PageView.builder(
         controller: _pageController,
-        itemCount: _defaultAvatars.length,
+        itemCount: AvatarMapper.count,
         onPageChanged: (index) {
-          setState(() {
-            _selectedAvatarIndex = index;
-          });
+          setState(() => _selectedAvatarIndex = index);
           widget.onAvatarSelected(index + 1);
         },
         itemBuilder: (context, index) {
+          final avatarId = index + 1;
+          final avatarPath = AvatarMapper.getAvatarAsset(avatarId);
+
           return AnimatedBuilder(
             animation: _pageController,
             builder: (context, child) {
@@ -60,7 +52,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
                   scale: value,
                   child: CircleAvatar(
                     radius: 70,
-                    backgroundImage: AssetImage(_defaultAvatars[index]),
+                    backgroundImage: AssetImage(avatarPath),
                   ),
                 ),
               );
