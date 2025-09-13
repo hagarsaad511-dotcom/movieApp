@@ -1,32 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+import 'package:movie_app/presentation/widgets/avatar_picker.dart';
+import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import 'package:movie_app/presentation/screens/login_screen.dart';
-import '../../ui/core/di/injection_container.dart';
+import 'package:provider/provider.dart';
+import '../../ui/core/utils/validators.dart';
 
-import '../../ui/core/themes/app_colors.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/lang_button.dart';
 import '../widgets/loading_button.dart';
+import 'language_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final _phoneController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  int _selectedAvatarId = 1;
+
+  // Normalizes phone to E.164 format (Egypt default +20)
+  String _normalizePhone(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.startsWith("0")) {
+      return "+2${trimmed.substring(1)}"; // convert 010... -> +2010...
+    }
+    return trimmed;
+  }
+
+  void _onSubmit() {
+    final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+
+    if (_formKey.currentState!.validate()) {
+      context.read<AuthCubit>().register(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        confirmPassword: _confirmPasswordController.text.trim(),
+        lang: langProvider.currentLangCode.trim(),
+        avatarId: _selectedAvatarId, // ✅ backend expects "avaterId"
+        phone: _normalizePhone(_phoneController.text),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -34,210 +66,236 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<AuthCubit>(),
-      child: Scaffold(
-        backgroundColor: AppColors.primaryBlack,
-        appBar: AppBar(
-          backgroundColor: AppColors.primaryBlack,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: Icon(
-              Icons.arrow_back,
-              color: AppColors.white,
-              size: 24.sp,
-            ),
-          ),
-        ),
-        body: BlocListener<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state is AuthAuthenticated) {
-              context.go('/home');
-            } else if (state is AuthError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: AppColors.red,
-                ),
-              );
-            }
-          },
-          child: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(24.w),
-              child: Form(
-                key: _formKey,
+    final lang = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
+          child: BlocListener<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is AuthSuccess) {
+                // ✅ Navigate to login after successful registration
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                context.go('/login'); // replace current stack with login
+              }
+            },
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
-                    Text(
-                      'Create Account',
-                      style: TextStyle(
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
+                    /// Top Row (Back Arrow + Register)
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back,
+                              color: AppColors.yellow),
+                          onPressed: () => context.pop(),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              lang.register,
+                              style: GoogleFonts.roboto(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.yellow,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 48),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+
+                    /// Avatar Picker
+                    Center(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 220.h,
+                            child: AvatarPicker(
+                              onAvatarSelected: (avatarId) {
+                                setState(() => _selectedAvatarId = avatarId);
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            lang.avatar,
+                            style: GoogleFonts.roboto(
+                              fontSize: 16.sp,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'Sign up to start watching movies',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        color: AppColors.lightGrey,
-                      ),
-                    ),
-                    SizedBox(height: 48.h),
-                    // Name field
+                    SizedBox(height: 24.h),
+
+                    /// Name
                     CustomTextField(
                       controller: _nameController,
-                      hintText: 'Full Name',
-                      prefixIcon: Icon(
-                        Icons.person_outlined,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
-                      ),
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
+                      hintText: lang.name,
+                      icon: Icons.person_outline,
+                      validator: (val) => val == null || val.isEmpty
+                          ? lang.enterNameError
+                          : null,
                     ),
-                    SizedBox(height: 20.h),
-                    // Email field
+                    SizedBox(height: 16.h),
+
+                    /// Email
                     CustomTextField(
                       controller: _emailController,
-                      hintText: 'Email',
+                      hintText: lang.email,
+                      icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
-                      prefixIcon: Icon(
-                        Icons.email_outlined,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      validator: (val) => Validators.validateEmail(
+                        val,
+                        emptyMsg: lang.enterEmailError,
+                        invalidMsg: lang.invalidEmailError,
                       ),
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value!)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                        },
                     ),
-                    SizedBox(height: 20.h),
-                    // Password field
+                    SizedBox(height: 16.h),
+
+                    /// Password
                     CustomTextField(
                       controller: _passwordController,
-                      hintText: 'Password',
+                      hintText: lang.passwordHint,
+                      icon: Icons.lock_outline,
                       obscureText: _obscurePassword,
-                      prefixIcon: Icon(
-                        Icons.lock_outlined,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() => _obscurePassword = !_obscurePassword);
+                        },
                       ),
-                      suffixIcon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      validator: (val) => Validators.validatePassword(
+                        val,
+                        emptyMsg: lang.enterPasswordError,
+                        lengthMsg: lang.passwordLengthError,
                       ),
-                      onSuffixIconTap: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please enter your password';
-                        }
-                        if (value!.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
                     ),
-                    SizedBox(height: 20.h),
-                    // Confirm password field
+                    SizedBox(height: 16.h),
+
+                    /// Confirm Password
                     CustomTextField(
                       controller: _confirmPasswordController,
-                      hintText: 'Confirm Password',
+                      hintText: lang.confirmPassword,
+                      icon: Icons.lock_outline,
                       obscureText: _obscureConfirmPassword,
-                      prefixIcon: Icon(
-                        Icons.lock_outlined,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          setState(() => _obscureConfirmPassword =
+                          !_obscureConfirmPassword);
+                        },
                       ),
-                      suffixIcon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      validator: (val) => Validators.validateConfirmPassword(
+                        val,
+                        _passwordController.text,
+                        mismatchMsg: lang.passwordsNotMatch,
                       ),
-                      onSuffixIconTap: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please confirm your password';
-                        }
-                        if (value != _passwordController.text) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
                     ),
-                    SizedBox(height: 32.h),
-                    // Register button
+                    SizedBox(height: 16.h),
+
+                    /// Phone
+                    CustomTextField(
+                      controller: _phoneController,
+                      hintText: lang.phoneNumber,
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      validator: (val) => Validators.validatePhone(
+                        val,
+                        emptyMsg: lang.enterPhoneError,
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+
+                    /// Register Button
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return LoadingButton(
-                          text: 'Create Account',
+                          text: lang.createAccount,
                           isLoading: state is AuthLoading,
-                          onPressed: () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              context.read<AuthCubit>().register(
-                                name: _nameController.text.trim(),
-                                email: _emailController.text.trim(),
-                                password: _passwordController.text,
-                                passwordConfirmation: _confirmPasswordController.text,
-                              );
-                            }
-                          },
+                          onPressed: _onSubmit,
+                          backgroundColor: AppColors.yellow,
+                          textColor: AppColors.primaryBlack,
                         );
                       },
                     ),
-                    const Spacer(),
-                    // Sign in link
+                    SizedBox(height: 20.h),
+
+                    /// Already Have Account
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Already have an account? ',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.lightGrey,
-                          ),
+                          "${lang.alreadyHaveAccount} ",
+                          style: GoogleFonts.roboto(color: AppColors.white),
                         ),
                         GestureDetector(
-                          onTap: () => context.pop(),
+                          onTap: () => context.push('/login'),
                           child: Text(
-                            'Sign In',
-                            style: TextStyle(
-                              fontSize: 14.sp,
+                            lang.login,
+                            style: GoogleFonts.roboto(
                               color: AppColors.yellow,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ],
+                    ),
+                    SizedBox(height: 20.h),
+
+                    /// Language Switcher
+                    Builder(
+                      builder: (context) {
+                        final langProvider =
+                        Provider.of<LanguageProvider>(context);
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            LangButton(
+                              langCode: "en",
+                              asset: "assets/icons/LR.png",
+                              isSelected: langProvider.currentLangCode == "en",
+                              onPressed: () => langProvider.setLang("en"),
+                            ),
+                            SizedBox(width: 10.w),
+                            LangButton(
+                              langCode: "ar",
+                              asset: "assets/icons/EG.png",
+                              isSelected: langProvider.currentLangCode == "ar",
+                              onPressed: () => langProvider.setLang("ar"),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
