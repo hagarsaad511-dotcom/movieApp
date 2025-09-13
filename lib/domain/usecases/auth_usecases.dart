@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../data/datasources/local_datasource.dart';
+import '../../data/models/auth_models.dart';
 import '../../ui/core/error/failures.dart';
 import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
@@ -45,17 +47,20 @@ class RegisterUseCase {
     );
   }
 }
-
 @injectable
-class ForgotPasswordUseCase {
+class ResetPasswordUseCase {
   final AuthRepository repository;
 
-  ForgotPasswordUseCase(this.repository);
+  ResetPasswordUseCase(this.repository);
 
   Future<Either<Failure, void>> call({
-    required String email,
+    required String oldPassword,
+    required String newPassword,
   }) async {
-    return await repository.forgotPassword(email: email);
+    return await repository.resetPassword(
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    );
   }
 }
 
@@ -79,6 +84,24 @@ class UpdateProfileUseCase {
     );
   }
 }
+@injectable
+class GoogleLoginUseCase {
+  final AuthRepository repository;
+  final LocalDataSource localDataSource; // ✅ add LocalDataSource
+
+  GoogleLoginUseCase(this.repository, this.localDataSource);
+
+  Future<Either<Failure, User>> call({required String idToken}) {
+    return repository.loginWithGoogle(idToken: idToken);
+  }
+
+  /// ✅ Helper for Firebase-only mode:
+  /// Allows AuthCubit to persist a Firebase user locally.
+  Future<void> saveLocalUser(UserModel user) async {
+    await localDataSource.saveUser(user);
+  }
+}
+
 
 @injectable
 class GetCurrentUserUseCase {
