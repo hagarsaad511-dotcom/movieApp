@@ -1,12 +1,14 @@
+import 'package:dio/dio.dart';
 import '../../ui/core/network/api_service.dart';
 import '../models/auth_models.dart';
 
 abstract class AuthRemoteDataSource {
   Future<LoginResponse> login(LoginRequest request);
   Future<RegisterResponse> register(RegisterRequest request);
-  Future<void> forgotPassword(ForgotPasswordRequest request);
+  Future<void> resetPassword({required String oldPassword, required String newPassword});
   Future<UserModel> updateProfile(UpdateProfileRequest request);
   Future<void> deleteAccount();
+  Future<UserModel> getProfile();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -14,12 +16,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   AuthRemoteDataSourceImpl(this.apiService);
 
+  Never _handleDioError(DioException e, String action) {
+    final status = e.response?.statusCode;
+    final data = e.response?.data;
+    print("❌ $action failed (Status: $status) ↳ $data");
+
+    String message;
+    if (data is Map<String, dynamic> && data['message'] != null) {
+      message = data['message'];
+    } else {
+      message = e.message ?? 'Unknown error';
+    }
+
+    throw Exception('[$action] $message');
+  }
+
   @override
   Future<LoginResponse> login(LoginRequest request) async {
     try {
       return await apiService.login(request);
-    } catch (e) {
-      throw Exception('Failed to login: $e');
+    } on DioException catch (e) {
+      _handleDioError(e, "Login");
     }
   }
 
@@ -27,17 +44,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<RegisterResponse> register(RegisterRequest request) async {
     try {
       return await apiService.register(request);
-    } catch (e) {
-      throw Exception('Failed to register: $e');
+    } on DioException catch (e) {
+      _handleDioError(e, "Register");
     }
   }
 
   @override
-  Future<void> forgotPassword(ForgotPasswordRequest request) async {
+  Future<void> resetPassword({required String oldPassword, required String newPassword}) async {
     try {
-      return await apiService.resetPassword(request);
-    } catch (e) {
-      throw Exception('Failed to reset password: $e');
+      return await apiService.resetPassword({"oldPassword": oldPassword, "newPassword": newPassword});
+    } on DioException catch (e) {
+      _handleDioError(e, "ResetPassword");
     }
   }
 
@@ -45,8 +62,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> updateProfile(UpdateProfileRequest request) async {
     try {
       return await apiService.updateProfile(request);
-    } catch (e) {
-      throw Exception('Failed to update profile: $e');
+    } on DioException catch (e) {
+      _handleDioError(e, "UpdateProfile");
     }
   }
 
@@ -54,8 +71,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> deleteAccount() async {
     try {
       return await apiService.deleteAccount();
-    } catch (e) {
-      throw Exception('Failed to delete account: $e');
+    } on DioException catch (e) {
+      _handleDioError(e, "DeleteAccount");
+    }
+  }
+
+  @override
+  Future<UserModel> getProfile() async {
+    try {
+      return await apiService.getProfile();
+    } on DioException catch (e) {
+      _handleDioError(e, "GetProfile");
     }
   }
 }
