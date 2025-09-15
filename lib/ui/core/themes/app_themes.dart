@@ -118,6 +118,8 @@ class AppTheme {
         elevation: 8,
         selectedLabelStyle: TextStyle(fontSize: 12.sp),
         unselectedLabelStyle: TextStyle(fontSize: 12.sp),
+        showUnselectedLabels: false,
+        showSelectedLabels: false,
       ),
     );
   }
