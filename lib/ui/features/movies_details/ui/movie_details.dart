@@ -13,9 +13,9 @@ import '../../../core/themes/app_colors.dart';
 import '../widgets/genres_widget.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
-  static String movieDetailsScreenRouteName = AppRoutes.movieDetailsScreenRoute;
+  // static String movieDetailsScreenRouteName = AppRoutes.movieDetailsScreenRoute;
 
-   MovieDetailsScreen({super.key, });
+   MovieDetailsScreen({super.key, required String movieId, });
 
 
   @override

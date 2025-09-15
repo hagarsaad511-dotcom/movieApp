@@ -3,12 +3,19 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import'package:movie_app/presentation/screens/register_screen.dart';
-import 'package:movie_app/ui/core/di/injection_container.dart';
+import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import 'language_provider.dart';
 import '../../ui/core/themes/app_colors.dart';
+import '../../ui/core/utils/validators.dart';
+import '../../l10n/gen/app_localizations.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/lang_button.dart';
 import '../widgets/loading_button.dart';
 
 final getIt = GetIt.instance;
@@ -26,6 +33,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
 
+  Future<UserCredential?> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return null;
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google Sign-In failed: $e")),
+      );
+      return null;
+    }
+  }
+
+  void _navigateToRegister() => context.push('/register');
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -35,145 +64,105 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = AppLocalizations.of(context)!;
+    final langProvider = context.watch<LanguageProvider>();
+
     return BlocProvider(
-      create: (context) => getIt<AuthCubit>(),
+      create: (_) => getIt<AuthCubit>(),
       child: Scaffold(
         backgroundColor: AppColors.primaryBlack,
         body: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthAuthenticated) {
-              context.go('/home');
+              context.go('/profile');
             } else if (state is AuthError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: AppColors.red,
+                  backgroundColor: Colors.red,
                 ),
               );
             }
           },
           child: SafeArea(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: EdgeInsets.all(24.w),
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 60.h),
-                    // Logo and title
+                    SizedBox(height: 40.h),
+
+                    /// Logo
                     Center(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 80.w,
-                            height: 80.h,
-                            decoration: const BoxDecoration(
-                              color: AppColors.yellow,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.movie,
-                              size: 40.sp,
-                              color: AppColors.primaryBlack,
-                            ),
-                          ),
-                          SizedBox(height: 24.h),
-                          Text(
-                            'Welcome Back!',
-                            style: TextStyle(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.white,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            'Sign in to continue watching',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              color: AppColors.lightGrey,
-                            ),
-                          ),
-                        ],
+                      child: Image.asset(
+                        "assets/images/login.png",
+                        width: 120.w,
+                        height: 120.h,
                       ),
                     ),
-                    SizedBox(height: 48.h),
-                    // Email field
+                    SizedBox(height: 40.h),
+
+                    /// Email
                     CustomTextField(
                       controller: _emailController,
-                      hintText: 'Email',
+                      hintText: lang.emailHint,
+                      icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
-                      prefixIcon: Icon(
-                        Icons.email_outlined,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      validator: (val) => Validators.validateEmail(
+                        val,
+                        emptyMsg: lang.enterEmailError,
+                        invalidMsg: lang.invalidEmailError,
                       ),
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value!)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
                     ),
                     SizedBox(height: 20.h),
-                    // Password field
+
+                    /// Password
                     CustomTextField(
                       controller: _passwordController,
-                      hintText: 'Password',
+                      hintText: lang.passwordHint,
+                      icon: Icons.lock_outline,
                       obscureText: _obscurePassword,
-                      prefixIcon: Icon(
-                        Icons.lock_outlined,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.white,
+                        ),
+                        onPressed: () =>
+                            setState(() => _obscurePassword = !_obscurePassword),
                       ),
-                      suffixIcon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: AppColors.lightGrey,
-                        size: 20.sp,
+                      validator: (val) => Validators.validatePassword(
+                        val,
+                        emptyMsg: lang.enterPasswordError,
+                        lengthMsg: lang.passwordLengthError,
                       ),
-                      onSuffixIconTap: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                      validator: (value) {
-                        if (value?.isEmpty ?? true) {
-                          return 'Please enter your password';
-                        }
-                        if (value!.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
                     ),
-                    SizedBox(height: 16.h),
-                    // Forgot password
+                    SizedBox(height: 12.h),
+
+                    /// Forgot Password
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () => context.push('/forgot-password'),
+                        onPressed: () => context.push('/reset-password'),
                         child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontSize: 14.sp,
+                          lang.forgotPassword,
+                          style: GoogleFonts.roboto(
                             color: AppColors.yellow,
+                            fontSize: 14.sp,
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 32.h),
-                    // Login button
+                    SizedBox(height: 24.h),
+
+                    /// Login button
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return LoadingButton(
-                          text: 'Sign In',
+                          text: lang.login,
                           isLoading: state is AuthLoading,
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
@@ -183,31 +172,98 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             }
                           },
+                          backgroundColor: AppColors.yellow,
+                          textColor: Colors.black,
                         );
                       },
                     ),
-                    const Spacer(),
-                    // Sign up link
+                    SizedBox(height: 20.h),
+
+                    /// Register link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Don\'t have an account? ',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.lightGrey,
-                          ),
+                          lang.noAccount,
+                          style: GoogleFonts.roboto(color: Colors.grey[400]),
                         ),
+                        SizedBox(width: 6.w),
                         GestureDetector(
-                          onTap: () => context.push('/register'),
+                          onTap: _navigateToRegister,
                           child: Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              fontSize: 14.sp,
+                            lang.signUp,
+                            style: GoogleFonts.roboto(
                               color: AppColors.yellow,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+
+                    /// Divider with OR
+                    Row(
+                      children: [
+                        const Expanded(child: Divider(color: AppColors.yellow)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w),
+                          child: Text(
+                            "OR",
+                            style: GoogleFonts.roboto(
+                              color: AppColors.yellow,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const Expanded(child: Divider(color: AppColors.yellow)),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+
+                    /// Google login
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          context.read<AuthCubit>().loginWithGoogle();
+                        },
+                        icon: Image.asset("assets/icons/google.png", height: 24.h),
+                        label: Text(
+                          lang.googleLogin,
+                          style: GoogleFonts.roboto(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.yellow,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                        ),
+                      ),
+
+                    ),
+                    SizedBox(height: 30.h),
+
+                    /// Language Switch
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        LangButton(
+                          langCode: "en",
+                          asset: "assets/icons/LR.png",
+                          isSelected: langProvider.currentLangCode == "en",
+                          onPressed: () => langProvider.setLang("en"),
+                        ),
+                        SizedBox(width: 10.w),
+                        LangButton(
+                          langCode: "ar",
+                          asset: "assets/icons/EG.png",
+                          isSelected: langProvider.currentLangCode == "ar",
+                          onPressed: () => langProvider.setLang("ar"),
                         ),
                       ],
                     ),

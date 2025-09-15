@@ -9,7 +9,7 @@ import '../../../core/themes/app_styles.dart';
 
 class BrowseScreen extends StatefulWidget {
   const BrowseScreen({super.key, });
-  static String searchScreenRouteName = AppRoutes.searchScreenRoute;
+  // static String searchScreenRouteName = AppRoutes.searchScreenRoute;
   // final  String? initialGenre;
 
   @override

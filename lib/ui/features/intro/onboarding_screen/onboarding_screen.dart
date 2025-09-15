@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:movie_app/ui/core/themes/app_assets.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:movie_app/ui/core/themes/app_styles.dart';
@@ -7,7 +8,7 @@ import '../../../../routing/app_routes.dart';
 
 
 class OnboardingScreen extends StatefulWidget {
-  static String onboardingScreenRouteName = AppRoutes.onboardingScreenRoute;
+  // static String onboardingScreenRouteName = AppRoutes.onboardingScreenRoute;
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
 }
@@ -62,7 +63,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           curve: Curves.easeInOut);
     } else {
 
-      Navigator.of(context).pushNamed(AppRoutes.mainScreenRoute)
+      // Navigator.of(context).pushNamed(AppRoutes.mainScreenRoute)
+    context.go('/login')
 
       ;
     }

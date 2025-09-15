@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:movie_app/data/services/api_manager.dart';
 import 'package:movie_app/ui/core/themes/app_assets.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
@@ -17,7 +18,7 @@ import '../widgets/watch_now_list.dart';
 
 class HomeScreen extends StatefulWidget {
     HomeScreen({super.key,});
-  static String homeScreenRouteName = AppRoutes.homeScreenRoute;
+  // static String homeScreenRouteName = AppRoutes.homeScreenRoute;
 
 
   @override
@@ -106,8 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return
     InkWell(
     onTap: () {
-    Navigator.of(context).pushNamed(AppRoutes.movieDetailsScreenRoute,
-    arguments: state.movies[index].id);
+      context.push('/movie-details/${state.movies[index].id}');
+    // arguments: state.movies[index].id);
     },
     child:
     MovieCard(movie: state.movies[index]));

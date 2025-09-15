@@ -10,7 +10,7 @@ import '../../../core/themes/app_assets.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
-  static String mainScreenRouteName = AppRoutes.mainScreenRoute;
+  // static String mainScreenRouteName = AppRoutes.mainScreenRoute;
 
   @override
   State<MainScreen> createState() => _MainScreenState();

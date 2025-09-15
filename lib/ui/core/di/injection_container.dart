@@ -9,64 +9,49 @@ import '../../../data/repositories/auth_repository_impl.dart';
 import '../../../data/datasources/auth_remote_datasource.dart';
 import '../../../data/datasources/local_datasource.dart';
 import '../../../presentation/cubits/auth/auth_cubit.dart';
-import '../../../ui/core/network/api_service.dart';
-
+import '../network/api_service.dart';
+import '../network/dio_client.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  // ---------------------------
   // External dependencies
+  // ---------------------------
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
   sl.registerLazySingleton<InternetConnectionChecker>(
-        () => InternetConnectionChecker(),
-  );
+          () => InternetConnectionChecker());
 
-  // Dio client
-  sl.registerLazySingleton<Dio>(() {
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: "https://your-api-base-url.com", // TODO: replace with real base URL
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      ),
-    );
+  // ---------------------------
+  // Core (Dio + Retrofit ApiService)
+  // ---------------------------
+  sl.registerLazySingleton<Dio>(() => DioClient.createAuthDio(sharedPreferences));
+  sl.registerLazySingleton<ApiService>(() => ApiService(
+    sl<Dio>(),
+    baseUrl: "https://route-movie-apis.vercel.app/",
+  ));
 
-    // Add interceptors if needed (logging, auth, etc.)
-    dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-    ));
-
-    return dio;
-  });
-
-  // ApiService
-  sl.registerLazySingleton<ApiService>(() => ApiService(sl<Dio>()));
-
+  // ---------------------------
   // Data sources
+  // ---------------------------
   sl.registerLazySingleton<AuthRemoteDataSource>(
-        () => AuthRemoteDataSourceImpl(sl<ApiService>()),
-  );
-
+          () => AuthRemoteDataSourceImpl(sl<ApiService>()));
   sl.registerLazySingleton<LocalDataSource>(
-        () => LocalDataSourceImpl(sl<SharedPreferences>()),
-  );
+          () => LocalDataSourceImpl(sl<SharedPreferences>()));
 
+  // ---------------------------
   // Repository
-  sl.registerLazySingleton<AuthRepository>(
-        () => AuthRepositoryImpl(
-      sl<AuthRemoteDataSource>(),
-      sl<LocalDataSource>(),
-      sharedPreferences: sl<SharedPreferences>(),
-      connectionChecker: sl<InternetConnectionChecker>(),
-    ),
-  );
+  // ---------------------------
+  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
+    sl<AuthRemoteDataSource>(),
+    sl<LocalDataSource>(),
+    sharedPreferences: sl<SharedPreferences>(),
+    connectionChecker: sl<InternetConnectionChecker>(),
+  ));
 
+  // ---------------------------
   // Use cases
+  // ---------------------------
   sl.registerLazySingleton(() => LoginUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => RegisterUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl<AuthRepository>()));
@@ -74,12 +59,23 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCurrentUserUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<AuthRepository>()));
   sl.registerLazySingleton(() => IsLoggedInUseCase(sl<AuthRepository>()));
+  sl.registerLazySingleton(() => DeleteAccountUseCase(sl<AuthRepository>()));
+  sl.registerLazySingleton(() => GoogleLoginUseCase(
+    sl<AuthRepository>(),
+    sl<LocalDataSource>(),
+  ));
 
-  // Cubit
+  // ---------------------------
+  // Cubits
+  // ---------------------------
   sl.registerFactory<AuthCubit>(() => AuthCubit(
     sl<LoginUseCase>(),
     sl<RegisterUseCase>(),
     sl<ResetPasswordUseCase>(),
     sl<UpdateProfileUseCase>(),
+    sl<GetCurrentUserUseCase>(),
+    sl<LogoutUseCase>(),
+    sl<DeleteAccountUseCase>(),
+    sl<GoogleLoginUseCase>(),
   ));
 }

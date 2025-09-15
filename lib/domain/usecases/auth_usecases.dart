@@ -1,9 +1,13 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 
-import '../../ui/core/error/failures';
+import '../../data/datasources/local_datasource.dart';
+import '../../data/models/auth_models.dart';
+import '../../ui/core/error/failures.dart';
 import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
 
+@injectable
 class LoginUseCase {
   final AuthRepository repository;
 
@@ -17,6 +21,7 @@ class LoginUseCase {
   }
 }
 
+@injectable
 class RegisterUseCase {
   final AuthRepository repository;
 
@@ -26,29 +31,40 @@ class RegisterUseCase {
     required String name,
     required String email,
     required String password,
-    required String passwordConfirmation,
+    required String confirmPassword,
+    required String lang,
+    required int avatarId,
+    required String phone,
   }) async {
     return await repository.register(
       name: name,
       email: email,
       password: password,
-      passwordConfirmation: passwordConfirmation,
+      confirmPassword: confirmPassword,
+      lang: lang,
+      avatarId: avatarId,
+      phone: phone,
     );
   }
 }
-
+@injectable
 class ResetPasswordUseCase {
   final AuthRepository repository;
 
   ResetPasswordUseCase(this.repository);
 
   Future<Either<Failure, void>> call({
-    required String email,
+    required String oldPassword,
+    required String newPassword,
   }) async {
-    return await repository.resetPassword(email: email);
+    return await repository.resetPassword(
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    );
   }
 }
 
+@injectable
 class UpdateProfileUseCase {
   final AuthRepository repository;
 
@@ -57,16 +73,37 @@ class UpdateProfileUseCase {
   Future<Either<Failure, User>> call({
     String? name,
     String? email,
-    String? avatar,
+    int? avatarId,
+    String? phone,
   }) async {
     return await repository.updateProfile(
       name: name,
       email: email,
-      avatar: avatar,
+      avatarId: avatarId,
+      phone: phone,
     );
   }
 }
+@injectable
+class GoogleLoginUseCase {
+  final AuthRepository repository;
+  final LocalDataSource localDataSource; // ✅ add LocalDataSource
 
+  GoogleLoginUseCase(this.repository, this.localDataSource);
+
+  Future<Either<Failure, User>> call({required String idToken}) {
+    return repository.loginWithGoogle(idToken: idToken);
+  }
+
+  /// ✅ Helper for Firebase-only mode:
+  /// Allows AuthCubit to persist a Firebase user locally.
+  Future<void> saveLocalUser(UserModel user) async {
+    await localDataSource.saveUser(user);
+  }
+}
+
+
+@injectable
 class GetCurrentUserUseCase {
   final AuthRepository repository;
 
@@ -77,6 +114,7 @@ class GetCurrentUserUseCase {
   }
 }
 
+@injectable
 class LogoutUseCase {
   final AuthRepository repository;
 
@@ -87,6 +125,7 @@ class LogoutUseCase {
   }
 }
 
+@injectable
 class IsLoggedInUseCase {
   final AuthRepository repository;
 
@@ -94,5 +133,16 @@ class IsLoggedInUseCase {
 
   Future<bool> call() async {
     return await repository.isLoggedIn();
+  }
+}
+
+@injectable
+class DeleteAccountUseCase {
+  final AuthRepository repository;
+
+  DeleteAccountUseCase(this.repository);
+
+  Future<Either<Failure, void>> call() async {
+    return await repository.deleteAccount();
   }
 }
