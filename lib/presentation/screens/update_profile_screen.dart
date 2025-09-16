@@ -183,13 +183,20 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) {
                   if (state is AuthAuthenticated) {
+                    // 🔄 Refresh profile before popping
+                    context.read<AuthCubit>().getCurrentUser();
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(lang.editProfile),
                         backgroundColor: AppColors.yellow,
                       ),
                     );
+
+                    // ✅ Close and return to ProfileScreen
+                    context.pop();
                   } else if (state is AuthError) {
+                    // ❌ Error → only show error
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(state.message),
@@ -209,8 +216,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             context: context,
                             builder: (_) => AlertDialog(
                               title: Text(lang.deleteAccount),
-                              content: Text(
-                                  'Are you sure you want to delete your account?'),
+                              content: const Text(
+                                'Are you sure you want to delete your account?',
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),

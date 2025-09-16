@@ -1,0 +1,35 @@
+{
+  "status": "ok",
+  "status_message": "Query was successful",
+  "data": {
+    "movie": {
+      "id": 1,
+      "title": "Inception",
+      "title_english": "Inception",
+      "year": 2010,
+      "rating": 8.8,
+      "runtime": 148,
+      "genres": ["Action", "Sci-Fi"],
+      "description_full": "Dom Cobb is a skilled thief, the absolute best in the dangerous art of extraction...",
+      "yt_trailer_code": "8hP9D6kZseM",
+      "large_cover_image": "https://yts.mx/assets/images/movies/inception_large.jpg",
+      "large_screenshot_image1": "https://yts.mx/assets/images/movies/inception_shot1.jpg",
+      "large_screenshot_image2": "https://yts.mx/assets/images/movies/inception_shot2.jpg",
+      "large_screenshot_image3": "https://yts.mx/assets/images/movies/inception_shot3.jpg",
+      "cast": [
+        {
+          "name": "Leonardo DiCaprio",
+          "character_name": "Cobb",
+          "url_small_image": "https://yts.mx/assets/images/cast/leo.jpg",
+          "imdb_code": "nm0000138"
+        },
+        {
+          "name": "Joseph Gordon-Levitt",
+          "character_name": "Arthur",
+          "url_small_image": "https://yts.mx/assets/images/cast/jgl.jpg",
+          "imdb_code": "nm0330687"
+        }
+      ]
+    }
+  }
+}

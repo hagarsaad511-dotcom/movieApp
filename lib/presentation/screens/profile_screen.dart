@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/user.dart';
 import '../cubits/auth/auth_cubit.dart';
 import '../cubits/auth/auth_state.dart';
-import '../widgets/loading_button.dart';
 import '../../../ui/core/themes/app_colors.dart';
-import '../widgets/stat_tile.dart';
-import '../widgets/profile_nav_bar.dart';
-import '../widgets/profile_header.dart'; // 👈 make sure you created this file
+import '../widgets/profile_header.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -77,6 +73,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryBlack,
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryBlack,
+        elevation: 0,
+        title: const Text(
+          "Profile",
+          style: TextStyle(color: AppColors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit, color: AppColors.yellow),
+            onPressed: () {
+              // ✅ Navigate inside the PageView flow
+              context.push('/profile/update');
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
