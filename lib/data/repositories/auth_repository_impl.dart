@@ -9,6 +9,7 @@ import '../../ui/core/error/failures.dart';
 import '../datasources/auth_remote_datasource.dart';
 import '../datasources/local_datasource.dart';
 import '../models/auth_models.dart';
+import '../models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -160,6 +161,18 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(_mapUserModelToUser(updatedUser));
     } catch (e) {
       return Left(ServerFailure(_extractMessage(e)));
+    }
+  }
+  @override
+  Future<Either<Failure, void>> forgotPassword({required String email}) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      print("✅ ForgotPassword: reset email sent to $email");
+      return const Right(null);
+    } on FirebaseAuthException catch (e) {
+      return Left(ServerFailure(e.message ?? "Failed to send reset email"));
+    } catch (e) {
+      return Left(ServerFailure("Forgot password error: $e"));
     }
   }
 

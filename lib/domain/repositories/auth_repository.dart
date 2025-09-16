@@ -14,6 +14,8 @@ abstract class AuthRepository {
     required int avatarId,
     required String phone,
   });
+  Future<Either<Failure, void>> forgotPassword({required String email});
+
   Future<Either<Failure, void>> resetPassword({required String oldPassword, required String newPassword});
   Future<Either<Failure, User>> updateProfile({String? name, String? email, int? avatarId, String? phone});
   Future<Either<Failure, User?>> getCurrentUser();
