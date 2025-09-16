@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:movie_app/routing/app_routes.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'l10n/gen/app_localizations.dart';
 import 'ui/core/di/injection_container.dart' as di;
 import 'presentation/cubits/auth/auth_cubit.dart';
+import 'presentation/cubits/auth/auth_state.dart';
 import 'presentation/screens/language_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase init
+  // ✅ Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   await di.init();
+
+  // ✅ preload prefs
+  final prefs = await SharedPreferences.getInstance();
+  final hasSeenOnboarding = prefs.getBool("seen_onboarding") ?? false;
 
   runApp(
     MultiProvider(
@@ -30,26 +35,14 @@ Future<void> main() async {
           create: (_) => di.sl<AuthCubit>()..getCurrentUser(),
         ),
       ],
-      child: const MyApp(),
+      child: MyApp(hasSeenOnboarding: hasSeenOnboarding),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  late final GoRouter _router;
-
-  @override
-  void initState() {
-    super.initState();
-    _router = AppRouters.create(context); // ✅ pass AuthCubit context
-  }
+class MyApp extends StatelessWidget {
+  final bool hasSeenOnboarding;
+  const MyApp({super.key, required this.hasSeenOnboarding});
 
   @override
   Widget build(BuildContext context) {
@@ -58,24 +51,34 @@ class _MyAppState extends State<MyApp> {
         return ScreenUtilInit(
           designSize: const Size(375, 812),
           builder: (_, __) {
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              title: 'Movie App',
-              theme: ThemeData(
-                scaffoldBackgroundColor: AppColors.primaryBlack,
-                primaryColor: AppColors.yellow,
-                fontFamily: 'Roboto',
-              ),
-              locale: Locale(langProvider.currentLangCode),
-              supportedLocales: AppLocalizations.supportedLocales,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              builder: (context, child) {
-                return Directionality(
-                  textDirection: langProvider.direction,
-                  child: child!,
+            return BlocBuilder<AuthCubit, AuthState>(
+              builder: (context, state) {
+                // ✅ Router now considers onboarding + auth state
+                final router = AppRouters.create(
+                  context,
+                  hasSeenOnboarding,
+                );
+
+                return MaterialApp.router(
+                  debugShowCheckedModeBanner: false,
+                  title: 'Movie App',
+                  theme: ThemeData(
+                    scaffoldBackgroundColor: AppColors.primaryBlack,
+                    primaryColor: AppColors.yellow,
+                    fontFamily: 'Roboto',
+                  ),
+                  locale: Locale(langProvider.currentLangCode),
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  localizationsDelegates: AppLocalizations.localizationsDelegates,
+                  builder: (context, child) {
+                    return Directionality(
+                      textDirection: langProvider.direction,
+                      child: child!,
+                    );
+                  },
+                  routerConfig: router,
                 );
               },
-              routerConfig: _router,
             );
           },
         );

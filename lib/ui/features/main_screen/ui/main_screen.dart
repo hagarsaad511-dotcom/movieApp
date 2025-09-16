@@ -6,6 +6,7 @@ import 'package:movie_app/ui/features/home/ui/home_screen.dart';
 import 'package:movie_app/ui/features/profile/ui/profile_screen.dart';
 import 'package:movie_app/ui/features/search/ui/search_screen.dart';
 
+import '../../../../presentation/screens/profile_screen.dart';
 import '../../../core/themes/app_assets.dart';
 
 class MainScreen extends StatefulWidget {

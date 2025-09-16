@@ -67,25 +67,23 @@ class _LoginScreenState extends State<LoginScreen> {
     final lang = AppLocalizations.of(context)!;
     final langProvider = context.watch<LanguageProvider>();
 
-    return BlocProvider(
-      create: (_) => getIt<AuthCubit>(),
-      child: Scaffold(
-        backgroundColor: AppColors.primaryBlack,
-        body: BlocListener<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state is AuthAuthenticated) {
-              context.go('/profile');
-            } else if (state is AuthError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          child: SafeArea(
-            child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: AppColors.primaryBlack,
+      body: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthAuthenticated) {
+            context.go('/profile'); // or '/home'
+          } else if (state is AuthError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        child: SafeArea(
+          child: SingleChildScrollView(
               padding: EdgeInsets.all(24.w),
               child: Form(
                 key: _formKey,
@@ -146,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () => context.push('/reset-password'),
+                        onPressed: () => context.go('/forgot-password'),
                         child: Text(
                           lang.forgotPassword,
                           style: GoogleFonts.roboto(
@@ -273,7 +271,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }

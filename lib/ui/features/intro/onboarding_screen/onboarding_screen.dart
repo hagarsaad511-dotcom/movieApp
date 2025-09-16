@@ -3,12 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:movie_app/ui/core/themes/app_assets.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:movie_app/ui/core/themes/app_styles.dart';
-
-import '../../../../routing/app_routes.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  // static String onboardingScreenRouteName = AppRoutes.onboardingScreenRoute;
+  const OnboardingScreen({super.key});
+
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
 }
@@ -51,130 +50,128 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "image": AppAssets.onboardingPosterSix,
       "title": "Start Watching Now",
-      "description":
-      "",
+      "description": "",
     },
   ];
 
-  void _nextPage() {
+  Future<void> _nextPage() async {
     if (_currentPage < onboardingData.length - 1) {
       _controller.nextPage(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut);
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     } else {
+      // ✅ Mark onboarding as seen
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool("seen_onboarding", true);
 
-      // Navigator.of(context).pushNamed(AppRoutes.mainScreenRoute)
-    context.go('/login')
-
-      ;
+      // ✅ Navigate to login
+      await prefs.setBool("seen_onboarding", true);
+      if (mounted) context.go('/login'); // ✅ replaces history
     }
   }
 
   void _prevPage() {
     if (_currentPage > 0) {
       _controller.previousPage(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut);
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
-    return Scaffold(
-        body: PageView.builder(
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
+    return WillPopScope(
+        onWillPop: () async => false, // disable back button
+        child: Scaffold(
+          body: PageView.builder(
         controller: _controller,
         itemCount: onboardingData.length,
         onPageChanged: (index) {
-      setState(() {
-        _currentPage = index;
-      });
-    },
-    itemBuilder: (context, index) {
-    return Container(
-    color: AppColors.primaryBlack,
-    child: Column(
-    children: [
-    Expanded(
-    child: Image.asset(
-    onboardingData[index]["image"]!,
-    fit: BoxFit.cover,
-    width: double.infinity,
-    ),
-    ),
-    Container(
-    padding: EdgeInsets.symmetric(
-      vertical: height*0.04,
-      horizontal: width*0.02
-    ),
-    decoration: const BoxDecoration(
-    color: AppColors.primaryBlack,
-    borderRadius:
-    BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    child: Column(
-    children: [
-    Text(
-    onboardingData[index]["title"]!,
-    style: AppStyles.white24BoldInter,
-    textAlign: TextAlign.center,
-    ),
-     SizedBox(height: height*0.02),
-    Text(
-    onboardingData[index]["description"]!,
-    style:AppStyles.white20regularInter,
-    textAlign: TextAlign.center,
-    ),
-     SizedBox(height: height*0.01),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-      ElevatedButton(
-
-      style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.yellow,
-      foregroundColor: AppColors.primaryBlack,
-        padding: EdgeInsets.symmetric(
-          vertical: 15
-        ),
-
+          setState(() => _currentPage = index);
+        },
+        itemBuilder: (context, index) {
+          return Container(
+            color: AppColors.primaryBlack,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Image.asset(
+                    onboardingData[index]["image"]!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: height * 0.04,
+                    horizontal: width * 0.02,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryBlack,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        onboardingData[index]["title"]!,
+                        style: AppStyles.white24BoldInter,
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: height * 0.02),
+                      Text(
+                        onboardingData[index]["description"]!,
+                        style: AppStyles.white20regularInter,
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: height * 0.01),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.yellow,
+                              foregroundColor: AppColors.primaryBlack,
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                            ),
+                            onPressed: _nextPage,
+                            child: Text(
+                              _currentPage == onboardingData.length - 1
+                                  ? "Done"
+                                  : _currentPage == 0
+                                  ? "Explore All"
+                                  : "Next",
+                              style: AppStyles.black20SemiBoldInter,
+                            ),
+                          ),
+                          SizedBox(height: height * 0.02),
+                          if (_currentPage > 0)
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 15),
+                                side: const BorderSide(color: AppColors.yellow),
+                                foregroundColor: AppColors.yellow,
+                              ),
+                              onPressed: _prevPage,
+                              child: Text(
+                                "Back",
+                                style: AppStyles.yellow20SemiBoldInter,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
-      onPressed: _nextPage,
-      child: Text(
-      _currentPage == onboardingData.length - 1
-      ? "Done"
-          : _currentPage == 0 ?
-      "Explore All"
-          :
-      "Next",
-       style: AppStyles.black20SemiBoldInter,),
-      ),
-          SizedBox(height: height*0.02), // placeholder
-
-      if (_currentPage > 0)
-      OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        padding: EdgeInsets.symmetric(
-          vertical: 15),
-      side:  BorderSide(color: AppColors.yellow),
-      foregroundColor: AppColors.yellow,
-      ),
-      onPressed: _prevPage,
-      child:  Text("Back", style: AppStyles.yellow20SemiBoldInter,),
-      )
-
-        ],
-      ),
-
-
-    ],
-    ),
-    ),
-    ],
-    ),
-    );
-    },
         ),
     );
   }

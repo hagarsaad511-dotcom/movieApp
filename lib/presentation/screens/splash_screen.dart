@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../presentation/cubits/auth/auth_cubit.dart';
+import '../../presentation/cubits/auth/auth_state.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,8 +20,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _navigate();
     });
@@ -28,14 +30,21 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    final hasSeenOnboarding = prefs.getBool('seen_onboarding') ?? false;
 
     print("hasSeenOnboarding = $hasSeenOnboarding");
 
-    if (hasSeenOnboarding) {
-      context.go('/login');
+    final authState = context.read<AuthCubit>().state;
+
+    if (!hasSeenOnboarding) {
+      // First time → Onboarding
+      context.go('/onboarding');
+    } else if (authState is AuthAuthenticated) {
+      // Already logged in → Home
+      context.go('/home');
     } else {
-      //context.go('/onboarding');
+      // Seen onboarding but not logged in → Login
+      context.go('/login');
     }
   }
 
