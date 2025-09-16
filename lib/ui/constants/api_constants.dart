@@ -18,7 +18,7 @@ class ApiConstants {
 
   /// PATCH → /auth/profile
   static const String getProfile = "/auth/profile";
-  static const String updateProfile = "/auth/profile";
+  static const String updateProfile = "profile";
   /// DELETE → /auth/delete
-  static const String delete = "/auth/profile";
+  static const String delete = "profile";
 }

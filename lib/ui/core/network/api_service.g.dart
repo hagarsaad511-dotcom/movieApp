@@ -135,7 +135,7 @@ class _ApiService implements ApiService {
       Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auth/profile',
+            'profile',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -162,7 +162,7 @@ class _ApiService implements ApiService {
       Options(method: 'DELETE', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auth/profile',
+            'profile',
             queryParameters: queryParameters,
             data: _data,
           )

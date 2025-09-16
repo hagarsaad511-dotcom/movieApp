@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:movie_app/data/models/auth_models.dart';
+import '../../../data/models/user_model.dart';
 import '../../constants/api_constants.dart';
 
 part 'api_service.g.dart';
