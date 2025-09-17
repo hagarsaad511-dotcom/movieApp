@@ -1,74 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
+import 'user_model.dart';
 
 part 'auth_models.g.dart';
-
-/// --------------------
-/// UserModel
-/// --------------------
-@JsonSerializable(explicitToJson: true)
-class UserModel extends Equatable {
-  @JsonKey(name: '_id', fromJson: _idFromJson, toJson: _idToJson)
-  final String id;
-
-  final String name;
-  final String email;
-
-  @JsonKey(name: 'avaterId') // backend typo
-  final int? avatarId;
-
-  final String? phone;
-  final String? createdAt;
-  final String? updatedAt;
-
-  /// ✅ Firebase users only
-  final String? photoUrl;
-
-  const UserModel({
-    required this.id,
-    required this.name,
-    required this.email,
-    this.avatarId,
-    this.phone,
-    this.createdAt,
-    this.updatedAt,
-    this.photoUrl,
-  });
-
-  /// ✅ Factory for Firebase user mapping
-  factory UserModel.fromFirebase({
-    required String uid,
-    required String email,
-    String? displayName,
-    String? phoneNumber,
-    String? photoUrl,
-  }) {
-    final now = DateTime.now().toIso8601String();
-    return UserModel(
-      id: uid,
-      name: displayName ?? "Guest",
-      email: email,
-      avatarId: null,
-      phone: phoneNumber,
-      createdAt: now,
-      updatedAt: now,
-      photoUrl: photoUrl,
-    );
-  }
-
-
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$UserModelToJson(this);
-
-  static String _idFromJson(dynamic id) => id == null ? '' : id.toString();
-  static dynamic _idToJson(String id) => id;
-
-  @override
-  List<Object?> get props =>
-      [id, name, email, avatarId, phone, createdAt, updatedAt, photoUrl];
-}
 
 /// --------------------
 /// LoginRequest
@@ -90,7 +24,7 @@ class LoginRequest extends Equatable {
 }
 
 /// --------------------
-/// LoginResponse (normal login)
+/// LoginResponse (normal login → returns token only)
 /// --------------------
 @JsonSerializable()
 class LoginResponse extends Equatable {
@@ -110,7 +44,7 @@ class LoginResponse extends Equatable {
 }
 
 /// --------------------
-/// LoginResponseWithUser (Google login / extended)
+/// LoginResponseWithUser (Google login / extended login)
 /// --------------------
 @JsonSerializable(explicitToJson: true)
 class LoginResponseWithUser {

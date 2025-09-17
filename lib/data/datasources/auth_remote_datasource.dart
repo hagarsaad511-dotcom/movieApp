@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../../ui/core/network/api_service.dart';
 import '../models/auth_models.dart';
+import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<LoginResponse> login(LoginRequest request);

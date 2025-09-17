@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../data/datasources/local_datasource.dart';
 import '../../data/models/auth_models.dart';
+import '../../data/models/user_model.dart';
 import '../../ui/core/error/failures.dart';
 import '../entities/user.dart';
 import '../repositories/auth_repository.dart';
@@ -47,6 +48,17 @@ class RegisterUseCase {
     );
   }
 }
+@injectable
+class ForgotPasswordUseCase {
+  final AuthRepository repository;
+
+  ForgotPasswordUseCase(this.repository);
+
+  Future<Either<Failure, void>> call(String email) {
+    return repository.forgotPassword(email: email);
+  }
+}
+
 @injectable
 class ResetPasswordUseCase {
   final AuthRepository repository;

@@ -1,0 +1,63 @@
+{
+  "status": "ok",
+  "status_message": "Query was successful",
+  "data": {
+    "movie_count": 2,
+    "limit": 20,
+    "page_number": 1,
+    "movies": [
+      {
+        "id": 1,
+        "url": "https://yts.mx/movies/inception-2010",
+        "imdb_code": "tt1375666",
+        "title": "Inception",
+        "title_english": "Inception",
+        "title_long": "Inception (2010)",
+        "slug": "inception-2010",
+        "year": 2010,
+        "rating": 8.8,
+        "runtime": 148,
+        "genres": ["Action", "Sci-Fi"],
+        "summary": "A thief who steals corporate secrets...",
+        "description_full": "Dom Cobb is a skilled thief...",
+        "synopsis": "Dream infiltration thriller",
+        "yt_trailer_code": "8hP9D6kZseM",
+        "language": "English",
+        "background_image": "",
+        "background_image_original": "",
+        "small_cover_image": "https://yts.mx/assets/images/movies/inception_small.jpg",
+        "medium_cover_image": "https://yts.mx/assets/images/movies/inception_medium.jpg",
+        "large_cover_image": "https://yts.mx/assets/images/movies/inception_large.jpg",
+        "state": "ok",
+        "date_uploaded": "2010-07-16",
+        "date_uploaded_unix": 1279238400
+      },
+      {
+        "id": 2,
+        "url": "https://yts.mx/movies/interstellar-2014",
+        "imdb_code": "tt0816692",
+        "title": "Interstellar",
+        "title_english": "Interstellar",
+        "title_long": "Interstellar (2014)",
+        "slug": "interstellar-2014",
+        "year": 2014,
+        "rating": 8.6,
+        "runtime": 169,
+        "genres": ["Adventure", "Drama", "Sci-Fi"],
+        "summary": "A team of explorers travel...",
+        "description_full": "Interstellar chronicles a daring mission...",
+        "synopsis": "Space exploration and time dilation",
+        "yt_trailer_code": "zSWdZVtXT7E",
+        "language": "English",
+        "background_image": "",
+        "background_image_original": "",
+        "small_cover_image": "https://yts.mx/assets/images/movies/interstellar_small.jpg",
+        "medium_cover_image": "https://yts.mx/assets/images/movies/interstellar_medium.jpg",
+        "large_cover_image": "https://yts.mx/assets/images/movies/interstellar_large.jpg",
+        "state": "ok",
+        "date_uploaded": "2014-11-07",
+        "date_uploaded_unix": 1415318400
+      }
+    ]
+  }
+}

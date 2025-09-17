@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../data/models/auth_models.dart';
+import '../../../data/models/user_model.dart';
 import '../../../domain/entities/user.dart';
 import '../../../domain/usecases/auth_usecases.dart';
 import 'auth_state.dart';
@@ -13,6 +14,7 @@ import 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;
+  final ForgotPasswordUseCase _forgotPasswordUseCase;
   final ResetPasswordUseCase _resetPasswordUseCase; // ✅ new
   final UpdateProfileUseCase _updateProfileUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
@@ -22,6 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit(
       this._loginUseCase,
       this._registerUseCase,
+      this._forgotPasswordUseCase,
       this._resetPasswordUseCase, // ✅ inject
       this._updateProfileUseCase,
       this._getCurrentUserUseCase,
@@ -54,14 +57,37 @@ class AuthCubit extends Cubit<AuthState> {
       password: password,
     );
 
-    result.fold(
-          (failure) => emit(AuthError(failure.message)),
-          (user) => emit(AuthAuthenticated(user)),
+    await result.fold(
+          (failure) {
+        emit(AuthError(failure.message));
+      },
+          (token) async {
+        print("✅ Login success → token saved");
+        // ⚡ Save token into secure storage (your repo should handle it)
+        // Then fetch user profile
+        final profileResult = await _getCurrentUserUseCase();
+        profileResult.fold(
+              (failure) {
+            print("❌ Failed to fetch profile after login: ${failure.message}");
+            emit(AuthError(failure.message));
+          },
+              (user) {
+            if (user == null) {
+              print("ℹ️ No profile found after login");
+              emit(AuthUnauthenticated());
+            } else {
+              print("✅ Profile fetched after login: ${jsonEncode(user.toJson())}");
+              emit(AuthAuthenticated(user));
+            }
+          },
+        );
+      },
     );
   }
 
 
-Future<void> loginWithGoogle() async {
+
+  Future<void> loginWithGoogle() async {
     emit(AuthLoading());
     try {
       final googleUser = await GoogleSignIn().signIn();
@@ -80,15 +106,7 @@ Future<void> loginWithGoogle() async {
       final firebaseUser = userCred.user;
 
       if (firebaseUser != null) {
-        final user = User.fromFirebase(
-          uid: firebaseUser.uid,
-          email: firebaseUser.email ?? "",
-          displayName: firebaseUser.displayName,
-          phoneNumber: firebaseUser.phoneNumber,
-          photoUrl: firebaseUser.photoURL,
-        );
-
-        // ✅ Save Firebase user locally so getCurrentUser works after restart
+        // ✅ Save Firebase user locally
         final userModel = UserModel.fromFirebase(
           uid: firebaseUser.uid,
           email: firebaseUser.email ?? "",
@@ -98,13 +116,47 @@ Future<void> loginWithGoogle() async {
         );
         await _googleLoginUseCase.saveLocalUser(userModel);
 
-        emit(AuthAuthenticated(user));
+        // ✅ Fetch profile from backend (same as normal login)
+        final profileResult = await _getCurrentUserUseCase();
+        profileResult.fold(
+              (failure) {
+            print("❌ Failed to fetch profile after Google login: ${failure.message}");
+            emit(AuthError(failure.message));
+          },
+              (user) {
+            if (user == null) {
+              print("ℹ️ No profile found after Google login");
+              emit(AuthUnauthenticated());
+            } else {
+              print("✅ Profile fetched after Google login: ${jsonEncode(user.toJson())}");
+              emit(AuthAuthenticated(user));
+            }
+          },
+        );
       } else {
         emit(AuthError("Google sign-in failed"));
       }
     } catch (e) {
       emit(AuthError("Google sign-in error: $e"));
     }
+  }
+
+  Future<void> forgotPassword(String email) async {
+    print("📤 AuthCubit → forgotPassword: $email");
+    emit(AuthLoading());
+
+    final result = await _forgotPasswordUseCase(email);
+
+    result.fold(
+          (failure) {
+        print("❌ ForgotPassword failed: ${failure.message}");
+        emit(AuthError(failure.message));
+      },
+          (_) {
+        print("✅ ForgotPassword success");
+        emit(AuthSuccess("Password reset email sent to $email"));
+      },
+    );
   }
 
 

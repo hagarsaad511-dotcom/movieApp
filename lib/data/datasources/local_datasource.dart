@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/auth_models.dart';
+import '../models/user_model.dart';
 
 abstract class LocalDataSource {
   Future<void> saveAuthToken(String token);
@@ -18,8 +19,17 @@ class LocalDataSourceImpl implements LocalDataSource {
   final SharedPreferences sharedPreferences;
   LocalDataSourceImpl(this.sharedPreferences);
 
+  static const String _seenOnboardingKey = 'seen_onboarding';
   static const String _authTokenKey = 'auth_token';
   static const String _userKey = 'user_data';
+
+  Future<void> setSeenOnboarding() async {
+    await sharedPreferences.setBool(_seenOnboardingKey, true);
+  }
+
+  Future<bool> hasSeenOnboarding() async {
+    return sharedPreferences.getBool(_seenOnboardingKey) ?? false;
+  }
 
   @override
   Future<void> saveAuthToken(String token) async {
