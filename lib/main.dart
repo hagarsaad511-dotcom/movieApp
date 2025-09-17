@@ -53,11 +53,7 @@ class MyApp extends StatelessWidget {
           builder: (_, __) {
             return BlocBuilder<AuthCubit, AuthState>(
               builder: (context, state) {
-                // ✅ Router now considers onboarding + auth state
-                final router = AppRouters.create(
-                  context,
-                  hasSeenOnboarding,
-                );
+                final router = AppRouters.create(context);
 
                 return MaterialApp.router(
                   debugShowCheckedModeBanner: false,
@@ -69,7 +65,8 @@ class MyApp extends StatelessWidget {
                   ),
                   locale: Locale(langProvider.currentLangCode),
                   supportedLocales: AppLocalizations.supportedLocales,
-                  localizationsDelegates: AppLocalizations.localizationsDelegates,
+                  localizationsDelegates:
+                  AppLocalizations.localizationsDelegates,
                   builder: (context, child) {
                     return Directionality(
                       textDirection: langProvider.direction,
