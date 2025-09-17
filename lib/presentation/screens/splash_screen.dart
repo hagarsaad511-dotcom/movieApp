@@ -17,15 +17,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _navigated = false; // ✅ prevent multiple calls
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _navigate();
+      _navigateOnce();
     });
   }
 
-  Future<void> _navigate() async {
+  Future<void> _navigateOnce() async {
+    if (_navigated) return; // ✅ already navigated
+    _navigated = true;
+
     await Future.delayed(const Duration(seconds: 2)); // splash duration
     if (!mounted) return;
 
@@ -37,13 +42,10 @@ class _SplashScreenState extends State<SplashScreen> {
     final authState = context.read<AuthCubit>().state;
 
     if (!hasSeenOnboarding) {
-      // First time → Onboarding
       context.go('/onboarding');
     } else if (authState is AuthAuthenticated) {
-      // Already logged in → Home
       context.go('/home');
     } else {
-      // Seen onboarding but not logged in → Login
       context.go('/login');
     }
   }
