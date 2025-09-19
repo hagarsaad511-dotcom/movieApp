@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../presentation/cubits/auth/auth_cubit.dart';
 import '../../../presentation/cubits/auth/auth_state.dart';
@@ -13,25 +14,29 @@ import '../../../presentation/screens/reset_password_screen.dart';
 import '../../../presentation/screens/profile_screen.dart';
 import '../../../presentation/screens/update_profile_screen.dart';
 import '../presentation/screens/forget_password_screen.dart';
+import '../ui/features/browse/ui/browse_screen.dart';
 import '../ui/features/intro/onboarding_screen/onboarding_screen.dart';
 import '../ui/features/main_screen/ui/main_screen.dart';
+
 class AppRouters {
-  static GoRouter create(BuildContext context, bool hasSeenOnboarding) {
+  static GoRouter create(BuildContext context) {
     return GoRouter(
       initialLocation: '/splash',
       debugLogDiagnostics: true,
       refreshListenable: GoRouterRefreshStream(
         context.read<AuthCubit>().stream,
       ),
-      redirect: (context, state) {
+      redirect: (context, state) async {
+        final prefs = await SharedPreferences.getInstance();
+        final hasSeenOnboarding = prefs.getBool('seen_onboarding') ?? false;
+
         final authState = context.read<AuthCubit>().state;
         final location = state.matchedLocation;
 
-        // ✅ Stay on splash while it decides
         if (location == '/splash') return null;
 
-        // ✅ Prevent onboarding after first time
-        if (hasSeenOnboarding && location == '/onboarding') {
+        // 👇 Onboarding ALWAYS comes before login
+        if (!hasSeenOnboarding && location != '/onboarding') {
           return '/login';
         }
 
@@ -42,7 +47,9 @@ class AppRouters {
             location.startsWith('/reset-password');
 
         // ✅ If not authenticated and tries to go somewhere protected → go login
-        if (!isAuth && !loggingIn) return '/login';
+        if (!isAuth && !loggingIn && location != '/onboarding') {
+          return '/login';
+        }
 
         // ✅ If authenticated but still at login/register → go home
         if (isAuth && loggingIn) return '/home';
@@ -57,6 +64,14 @@ class AppRouters {
         GoRoute(path: '/forgot-password', builder: (_, __) => const ForgotPasswordScreen()),
         GoRoute(path: '/reset-password', builder: (_, __) => const ResetPasswordScreen()),
         GoRoute(path: '/home', builder: (_, __) => const MainScreen()),
+        GoRoute(
+          path: '/browse',
+          builder: (context, state) {
+            final genre = state.extra as String?;
+            return BrowseScreen(initialGenre: genre);
+          },
+        ),
+
         GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
         GoRoute(path: '/profile/update', builder: (_, __) => const UpdateProfileScreen()),
       ],
@@ -64,8 +79,6 @@ class AppRouters {
   }
 }
 
-
-/// ✅ Helper so GoRouter reacts to Bloc state changes
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     _subscription = stream.asBroadcastStream().listen((_) {

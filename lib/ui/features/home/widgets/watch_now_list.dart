@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:movie_app/data/model/response/movies_list_response.dart';
 import 'package:movie_app/routing/app_routes.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
@@ -58,25 +59,22 @@ class _WatchNowListState extends State<WatchNowList> {
   }
 
   List<Movies> moviesOfGenre(String genre) {
-    return widget.movies.where((movie) => movie.genres?.contains(genre) ?? false).toList();
+    return widget.movies
+        .where((movie) => movie.genres?.contains(genre) ?? false)
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final genres = uniqueGenres(widget.movies);
-    var height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    var width = MediaQuery
-        .of(context)
-        .size
-        .width;
-
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
 
     return ListView.separated(
+      shrinkWrap: true, // ✅ auto-size to content
+      physics: const NeverScrollableScrollPhysics(), // ✅ delegate scroll to parent
       itemCount: genres.length,
-      separatorBuilder: (context, index) =>  SizedBox(height: height*0.01),
+      separatorBuilder: (context, index) => SizedBox(height: height * 0.02),
       itemBuilder: (context, index) {
         final genre = genres[index];
         final moviesForGenre = moviesOfGenre(genre).take(4).toList();
@@ -84,38 +82,39 @@ class _WatchNowListState extends State<WatchNowList> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// Genre title + See More
             Row(
-
               children: [
-                Text(
-                  genre,
-                  style: AppStyles.white16regular,
-                ),
-                Spacer(),
+                Text(genre, style: AppStyles.white16regular),
+                const Spacer(),
                 InkWell(
-                  onTap: (){
-                    ///todo:navigation   to browse screen
-
-
+                  onTap: () {
+                    context.push('/browse', extra: genre); // pass genre string
                   },
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text('See More', style: AppStyles.yellow16regular,),
-                      Icon(Icons.arrow_forward_outlined, color: AppColors.yellow,)
+                      Text("See More", style: AppStyles.yellow16regular),
+                      const Icon(Icons.arrow_forward_outlined, color: AppColors.yellow),
                     ],
                   ),
-                )
+                ),
+
 
               ],
             ),
-             SizedBox(height: height*0.02),
-            SizedBox(
-              height: height*0.2,
+            SizedBox(height: height * 0.02),
+
+            /// Horizontal movies for this genre
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: 160,
+                maxHeight: 220, // keeps cards consistent
+              ),
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: moviesForGenre.length,
-                separatorBuilder: (context, index) => SizedBox(width: width*0.04,),
+                separatorBuilder: (context, i) =>
+                    SizedBox(width: width * 0.04),
                 itemBuilder: (context, i) {
                   return MovieCardSmall(movie: moviesForGenre[i]);
                 },

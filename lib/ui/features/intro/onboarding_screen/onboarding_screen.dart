@@ -65,9 +65,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool("seen_onboarding", true);
 
-      // ✅ Navigate to login
-      await prefs.setBool("seen_onboarding", true);
-      if (mounted) context.go('/login'); // ✅ replaces history
+      // ✅ Navigate to login (replace stack)
+      if (mounted) context.go('/login');
     }
   }
 
@@ -86,93 +85,97 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final width = MediaQuery.of(context).size.width;
 
     return WillPopScope(
-        onWillPop: () async => false, // disable back button
-        child: Scaffold(
-          body: PageView.builder(
-        controller: _controller,
-        itemCount: onboardingData.length,
-        onPageChanged: (index) {
-          setState(() => _currentPage = index);
-        },
-        itemBuilder: (context, index) {
-          return Container(
-            color: AppColors.primaryBlack,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Image.asset(
-                    onboardingData[index]["image"]!,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
+      onWillPop: () async => false, // disable back button
+      child: Scaffold(
+        body: PageView.builder(
+          controller: _controller,
+          itemCount: onboardingData.length,
+          onPageChanged: (index) {
+            setState(() => _currentPage = index);
+          },
+          itemBuilder: (context, index) {
+            return Container(
+              color: AppColors.primaryBlack,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Image.asset(
+                      onboardingData[index]["image"]!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: height * 0.04,
-                    horizontal: width * 0.02,
-                  ),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryBlack,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        onboardingData[index]["title"]!,
-                        style: AppStyles.white24BoldInter,
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: height * 0.02),
-                      Text(
-                        onboardingData[index]["description"]!,
-                        style: AppStyles.white20regularInter,
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: height * 0.01),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.yellow,
-                              foregroundColor: AppColors.primaryBlack,
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                            ),
-                            onPressed: _nextPage,
-                            child: Text(
-                              _currentPage == onboardingData.length - 1
-                                  ? "Done"
-                                  : _currentPage == 0
-                                  ? "Explore All"
-                                  : "Next",
-                              style: AppStyles.black20SemiBoldInter,
-                            ),
-                          ),
-                          SizedBox(height: height * 0.02),
-                          if (_currentPage > 0)
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                                side: const BorderSide(color: AppColors.yellow),
-                                foregroundColor: AppColors.yellow,
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: height * 0.04,
+                      horizontal: width * 0.02,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primaryBlack,
+                      borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          onboardingData[index]["title"]!,
+                          style: AppStyles.white24BoldInter,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: height * 0.02),
+                        Text(
+                          onboardingData[index]["description"]!,
+                          style: AppStyles.white20regularInter,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: height * 0.01),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.yellow,
+                                foregroundColor: AppColors.primaryBlack,
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 15),
                               ),
-                              onPressed: _prevPage,
+                              onPressed: _nextPage,
                               child: Text(
-                                "Back",
-                                style: AppStyles.yellow20SemiBoldInter,
+                                _currentPage == onboardingData.length - 1
+                                    ? "Done"
+                                    : _currentPage == 0
+                                    ? "Explore All"
+                                    : "Next",
+                                style: AppStyles.black20SemiBoldInter,
                               ),
                             ),
-                        ],
-                      ),
-                    ],
+                            SizedBox(height: height * 0.02),
+                            if (_currentPage > 0)
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding:
+                                  const EdgeInsets.symmetric(vertical: 15),
+                                  side: const BorderSide(
+                                      color: AppColors.yellow),
+                                  foregroundColor: AppColors.yellow,
+                                ),
+                                onPressed: _prevPage,
+                                child: Text(
+                                  "Back",
+                                  style: AppStyles.yellow20SemiBoldInter,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+                ],
+              ),
+            );
+          },
         ),
+      ),
     );
   }
 }

@@ -8,9 +8,8 @@ import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_styles.dart';
 
 class BrowseScreen extends StatefulWidget {
-  const BrowseScreen({super.key, });
-  // static String searchScreenRouteName = AppRoutes.searchScreenRoute;
-  // final  String? initialGenre;
+  final String? initialGenre; // optional genre filter
+  const BrowseScreen({super.key, this.initialGenre});
 
   @override
   State<BrowseScreen> createState() => _BrowseScreenState();
@@ -19,61 +18,50 @@ class BrowseScreen extends StatefulWidget {
 class _BrowseScreenState extends State<BrowseScreen> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-        body: FutureBuilder(
-          future: ApiManager.getMoviesList(),
-          builder: (context, snapshot) {
-            ///todo: Loading
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.mediumGrey,
-                ),
-              );
-            }
-            ///todo: client => error
-            else if (snapshot.hasError) {
-              return Column(
-                children: [
-                  Text('${snapshot.error}',
-                      style: AppStyles.white20regular),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: Text('Try Again',
-                      style: AppStyles.yellow16regular,),
-                  )
-                ],
-              );
-            };
+      backgroundColor: AppColors.primaryBlack,
+      body: FutureBuilder<MoviesListResponse?>(
+        future: ApiManager.getMoviesList(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.mediumGrey),
+            );
+          } else if (snapshot.hasError) {
+            return _buildError(snapshot.error.toString());
+          }
 
-            ///todo: server => error
-            final movies = snapshot.data?.data?.movies ?? [];
-            final categorizedMovies = categorizeMovies(movies);
-            if (snapshot.data?.status != 'ok') {
-              return Column(
-                children: [
-                  Text(snapshot.data!.statusMessage!,
-                      style: AppStyles.white20regular),
-                  ElevatedButton(
-                    onPressed: () {
-                      ApiManager.getMoviesList();
-                      setState(() {
+          final data = snapshot.data;
+          if (data == null || data.status != 'ok') {
+            return _buildError(data?.statusMessage ?? "Unknown error occurred");
+          }
 
-                      });
-                    },
-                    child: Text('Try Again',
-                        style: AppStyles.white20regular),
-                  )
-                ],
-              );
-            }
-            ///todo: server =>success
-            return MoviesByCategoryScreen(
-                categorizedMovies: categorizedMovies,
-              );
+          final movies = data.data?.movies ?? [];
+          final categorizedMovies = categorizeMovies(movies);
 
-          },)
+          return MoviesByCategoryScreen(
+            categorizedMovies: categorizedMovies,
+            initialGenre: widget.initialGenre,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildError(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(message, style: AppStyles.white20regular),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => setState(() {}),
+            child: Text("Try Again", style: AppStyles.yellow16regular),
+          ),
+        ],
+      ),
     );
   }
 }
+

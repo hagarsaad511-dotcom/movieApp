@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:movie_app/ui/core/themes/app_colors.dart';
 import 'package:movie_app/ui/features/browse/ui/browse_screen.dart';
 import 'package:movie_app/ui/features/home/ui/home_screen.dart';
@@ -28,6 +29,25 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: selectedIndex);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // ✅ read ?tab= from the current route
+    final uri = GoRouterState.of(context).uri;
+    final tabParam = uri.queryParameters['tab'];
+
+    if (tabParam != null) {
+      final newIndex = int.tryParse(tabParam) ?? 0;
+      if (newIndex != selectedIndex) {
+        setState(() {
+          selectedIndex = newIndex;
+          _pageController.jumpToPage(newIndex);
+        });
+      }
+    }
   }
 
   @override
@@ -93,7 +113,11 @@ class _MainScreenState extends State<MainScreen> {
               currentIndex: selectedIndex,
               onTap: (index) {
                 setState(() => selectedIndex = index);
-                _pageController.jumpToPage(index);
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
               },
             ),
           ),
