@@ -48,33 +48,62 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: CircularProgressIndicator(color: AppColors.mediumGrey),
               );
             } else if (state is HomeScreenErrorState) {
-              return Center(
+              return SingleChildScrollView(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(state.errorMessage, style: AppStyles.white20regular),
+                    SizedBox(height: height * 0.25),
+                    Icon(Icons.error_outline, color: Colors.red.shade300, size: 64),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Failed to load movies",
+                      style: AppStyles.white20regular,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.errorMessage,
+                      style: AppStyles.white20regular,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: viewModel.getMoviesList,
-                      child: Text('Try Again', style: AppStyles.yellow16regular),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.yellow,
+                      ),
+                      child: const Text("Retry"),
                     ),
                   ],
                 ),
               );
-            } else if (state is HomeScreenSuccessState) {
+            }
+
+            if (state is HomeScreenSuccessState) {
               final movies = state.movies;
+
+              // 🔥 guard if empty list
+              if (movies.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "No movies available right now",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }
 
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    // 🔥 Gradient + background image at top only
+                    // Top gradient + image
                     Container(
-                      height: height * 0.7, // gradient taller than half
+                      height: height * 0.7,
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           fit: BoxFit.cover,
                           image: NetworkImage(
-                            movies[currentPage].largeCoverImage ?? '',
+                            movies[currentPage].largeCoverImage ?? "",
                           ),
+                          onError: (_, __) {}, // 👌 prevents crashes
                         ),
                       ),
                       child: Container(
@@ -93,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: height * 0.3,
                               child: CarouselSlider.builder(
                                 itemCount: movies.length,
-                                itemBuilder: (context, index, realIndex) {
+                                itemBuilder: (context, index, _) {
                                   return InkWell(
                                     onTap: () {
                                       context.push('/movie-details/${movies[index].id}');
@@ -115,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                    // 🔥 Below gradient → pure black background
+                    // Watch now list
                     Container(
                       color: AppColors.primaryBlack,
                       width: double.infinity,
@@ -133,7 +162,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             }
-            return Container();
+
+            // Default safe fallback
+            return const Center(
+              child: Text("Welcome", style: TextStyle(color: Colors.white)),
+            );
           },
         ),
       ),
