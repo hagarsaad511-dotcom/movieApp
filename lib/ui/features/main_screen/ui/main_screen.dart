@@ -8,12 +8,12 @@ import '../../../../presentation/screens/profile_screen.dart';
 import '../../../core/themes/app_assets.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final int initialTab;
+  const MainScreen({super.key, this.initialTab = 0});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
-
 class _MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
   late PageController _pageController;
@@ -28,17 +28,15 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    selectedIndex = widget.initialTab;
     _pageController = PageController(initialPage: selectedIndex);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // ✅ read ?tab= from the current route
     final uri = GoRouterState.of(context).uri;
     final tabParam = uri.queryParameters['tab'];
-
     if (tabParam != null) {
       final newIndex = int.tryParse(tabParam) ?? 0;
       if (newIndex != selectedIndex) {
@@ -49,6 +47,7 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
   }
+
 
   @override
   void dispose() {
